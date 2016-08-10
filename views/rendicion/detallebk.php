@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
-use app\models\RecursoProgramado;
+
 ?>
 
 <h3>Nueva Rendición</h3>
@@ -12,79 +12,140 @@ use app\models\RecursoProgramado;
 
 <div>
     <div class="clearfix"></div>
-    <div class="col-md-12">
-	<div id="detalle">
-	    
-	</div>
+    <div class="col-xs-12 col-sm-7 col-md-12">
+	<table class="table borderless table-hover" name="DetalleRendicion[detalle_tabla]" id="detalle_tabla" border="0">
+	    <thead>
+		<tr>
+		    <th class="text-center">
+			Clasificador
+		    </th>
+		    <th class="text-center">
+			Descripción
+		    </th>
+		    <th class="text-center">
+			Año
+		    </th>
+		    <th class="text-center">
+			Mes
+		    </th>
+		    <th class="text-center">
+			P. Unitario
+		    </th>
+		    <th class="text-center">
+			Cantidad
+		    </th>
+		    <th class="text-center">
+			Ruc
+		    </th>
+		    <th class="text-center">
+			Razón
+		    </th>
+		    <th class="text-center">
+			Total
+		    </th>
+		    <th>
+		    </th>
+		</tr>
+	    </thead>
+	    <tfoot>
+		<tr>
+		    <td></td>
+		    <td></td>
+		    <td></td>
+		    <td></td>
+		    <td></td>
+		    <td></td>
+		    <td></td>
+		  <td>
+		    Total:
+		  </td>
+		  <td>
+		    <div class="form-group field-aportante-totaltotal required">
+				<input type="text" id="totales" class="form-control decimal"  placeholder="" value="0.00" disabled/>
+		    </div>
+		  </td>
+		  <td></td>
+		</tr>
+	  </tfoot>
+	    <tbody>
+		<?php $det=0; ?>
+		
+		    <tr id='detalle_addr_0'>
+			    <td>
+				<input type="hidden" name="DetalleRendicion[numero][]" id="detallerendicion-numero_<?= $det; ?>" value="<?= $det; ?>" />
+				<div class="form-group field-detallerendicion-id_clasificador_0  required ">
+				    <select onchange="descripcion(<?= $det; ?>)" class="form-control" id="detallerendicion-id_clasificador_0" name="DetalleRendicion[clasificador_id][]" >
+					<option value="0" >-Seleccionar-</option>
+					<?php foreach($clasificadores as $clasif){ ?>
+					    
+					    <option value="<?= $clasif->clasificador_id ?>" ><?= $clasif->descripcion ?></option>
+					    
+					<?php } ?>
+				    </select>
+				</div>
+				
+			</td>
+
+			    <td class="col-xs-1">
+				<div class="form-group field-detallerendicion-descripcion_0  required ">
+				    <select onchange="anio(<?= $det; ?>)" class="form-control" id="detallerendicion-descripcion_0" name="DetalleRendicion[descripcion][]" >
+					<option value="0" >-Seleccionar-</option>
+				    </select>
+				</div>
+			    </td>
+			    <td class="col-xs-1">
+				<div class="form-group field-detallerendicion-anio_0  required ">
+				    <select onchange="mes(<?= $det; ?>)" class="form-control" id="detallerendicion-anio_0" name="DetalleRendicion[anio][]" >
+					<option value="0" >-Seleccionar-</option>
+				    </select>
+				</div>
+			    </td>
+			    <td>
+				<div class="form-group field-detallerendicion-mes_0  required ">
+				    <select onchange="precio_cantidad(<?= $det; ?>)" class="form-control" id="detallerendicion-mes_0" name="DetalleRendicion[mes][]" >
+					<option value="0" >-Seleccionar-</option>
+				    </select>
+				</div>
+			    </td>
+			    <td>
+				<div class="form-group field-detallerendicion-precio_unit_0 required">
+				    <input onkeyup="calcular_total(<?= $det; ?>)" type="text" id="detallerendicion-precio_unit_0" class="form-control decimal" name="DetalleRendicion[precio_unit][]" placeholder=""  />
+				</div>
+			    </td>
+			    <td>
+				<div class="form-group field-detallerendicion-cantidad_0 required">
+				    <input onkeyup="calcular_total(<?= $det; ?>)" type="text" id="detallerendicion-cantidad_0" class="form-control entero" name="DetalleRendicion[cantidad][]" placeholder=""  />
+				</div>
+			    </td>
+			    <td>
+				<div class="form-group field-detallerendicion-ruc_0 required">
+				    <input type="text" id="detallerendicion-ruc_0" class="form-control entero" name="DetalleRendicion[ruc][]" placeholder=""  />
+				</div>
+			    </td>
+			    <td>
+				<div class="form-group field-detallerendicion-razon_social_0 required">
+				    <input type="text" id="detallerendicion-razon_social_0" class="form-control" name="DetalleRendicion[razon_social][]" placeholder=""  />
+				</div>
+			    </td>
+			    <td>
+				<div class="form-group field-detallerendicion-total_0 required">
+				    <input type="text" id="detallerendicion-total_0" class="form-control" name="DetalleRendicion[total][]" placeholder=""  Disabled>
+				</div>
+			    </td>
+			    <td>
+				<span class="eliminar glyphicon glyphicon-minus-sign" >
+				<input type="hidden" id="detalle_ids_0" name="DetalleRendicion[detalle_ids][]" value="" />
+				</span>
+			    </td>
+		    </tr>
+		    <?php $det=1; ?>
+		<?php //} ?>
+		<tr id='detalle_addr_<?= $det ?>'></tr>
+	    </tbody>
+	</table>
+	<div id="agregar_registro" onclick="" class="btn btn-default pull-left btn_hide" value="1">Agregar</div>
+	<br>
     </div>
-    <div class="clearfix"></div>
-    <div class="panel-group" id="accordion">
-	<?php $cont=0; ?>
-	<?php foreach($clasificadores as $clasificador){ ?>
-	<div class="panel panel-primary">
-	    <div class="panel-heading">
-		<div class="col-md-1">
-		    <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse<?= $cont ?>" aria-expanded="false">
-			<span style="color:black" class="glyphicon glyphicon-plus"></span>
-		    </a>
-		</div>
-		<div class="col-md-8">
-		    <?= $clasificador->descripcion ?>
-		    <input type="hidden" name="">
-		</div>
-		<div class="clearfix"></div>
-	    </div>
-	    <div id="collapse<?= $cont ?>" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
-		<div class="panel-body">
-		    <?php $recursos = RecursoProgramado::find()
-                        ->select('recurso.id as recurso_id, recurso.detalle,recurso_programado.anio,recurso_programado.mes,recurso_programado.precio_unit, (recurso_programado.cantidad - recurso_programado.cant_rendida) as cantidad')
-                                ->innerJoin('recurso','recurso.id=recurso_programado.id_recurso')
-                                ->innerJoin('aportante','aportante.id=recurso.fuente')
-                                ->innerJoin('maestros','maestros.id=recurso.clasificador_id')
-                                ->innerJoin('actividad','actividad.id=recurso.actividad_id')
-                                ->innerJoin('indicador','indicador.id=actividad.id_ind')
-                                ->innerJoin('objetivo_especifico','objetivo_especifico.id=indicador.id_oe')
-                                ->innerJoin('proyecto','proyecto.id=objetivo_especifico.id_proyecto')
-                                ->where('proyecto.estado = 1 and proyecto.user_propietario=:user_propietario and aportante.tipo = 1 and recurso_programado.estado = 1 and recurso_programado.cantidad > 0  and recurso.clasificador_id = :clasificador_id',[':user_propietario'=>Yii::$app->user->identity->id,':clasificador_id'=>$clasificador->clasificador_id])
-                                ->groupBy('recurso_id,recurso.detalle,recurso_programado.anio,recurso_programado.mes')
-                                ->all();
-		    ?>
-		    <table class="table borderless table-hover">
-			<thead>
-			    <th>Recurso</th>
-			    <th>Año</th>
-			    <th>Mes</th>
-			    <th>P. Unitario</th>
-			    <th>Cantidad</th>
-			    <th>Ruc</th>
-			    <th>Razón</th>
-			    <th>Total</th>
-			</thead>
-			
-		    <?php $a=0; ?>
-		    <?php foreach($recursos as $recurso){ ?>
-			<tr><input type="hidden" name="DetalleRendicion[clasificador_id][]" value="<?= $clasificador->clasificador_id ?>">
-			    <td><?= $recurso->detalle ?> <input type="hidden" name="DetalleRendicion[recursos][]" value="<?= $recurso->recurso_id ?>"></td>
-			    <td><?= $recurso->anio ?> <input type="hidden" name="DetalleRendicion[anio][]" value="<?= $recurso->anio ?>"></td>
-			    <td><?= $model->GetMes($recurso->mes) ?> <input type="hidden" name="DetalleRendicion[mes][]" value="<?= $recurso->mes ?>"></td>
-			    <td><input onkeyup="calcular_total('<?= $cont.'_'.$a ?>')" type="text" id="detallerendicion-precio_unit_<?= $cont.'_'.$a ?>" class="form-control decimal" name="DetalleRendicion[precio_unit][]" placeholder="" value="<?= $recurso->precio_unit ?>" /></td>
-			    <td><input onkeyup="calcular_total('<?= $cont.'_'.$a ?>')" type="text" id="detallerendicion-cantidad_<?= $cont.'_'.$a ?>" class="form-control entero" name="DetalleRendicion[cantidad][]" placeholder=""  value="<?= $recurso->cantidad ?>"/></td>
-			    <td><input type="text" id="detallerendicion-ruc_<?= $cont.'_'.$a ?>" class="form-control entero numerico" name="DetalleRendicion[ruc][]" placeholder=""  maxlength="12"/></td>
-			    <td><input type="text" id="detallerendicion-razon_social_<?= $cont.'_'.$a ?>" class="form-control texto" name="DetalleRendicion[razon_social][]" placeholder=""  /></td>
-			    <td><input type="text" id="detallerendicion-total_<?= $cont.'_'.$a ?>" class="form-control" name="DetalleRendicion[total][]" placeholder=""  Disabled value="<?= $recurso->cantidad*$recurso->precio_unit ?>"></td>
-			</tr>
-			<?php $a++; ?>
-		    <?php } ?>
-		    
-		    </table>
-		</div>
-	    </div>
-	</div>
-	<?php $cont++ ;?>
-	<?php } ?>
-    </div>
-    
-    <?php $det=1;?>
     <div class="clearfix"></div>
     <div class="col-md-12">
 	<table class="table borderless table-hover" id="detalle_tabla_archivo" border="0">
@@ -128,9 +189,6 @@ use app\models\RecursoProgramado;
     $ver_cantidad= Yii::$app->getUrlManager()->createUrl('rendicion/verificar_cantidad_pro');
     $ver_saldo= Yii::$app->getUrlManager()->createUrl('rendicion/verificar_saldo_desembolso');
     $obt_clasificador= Yii::$app->getUrlManager()->createUrl('rendicion/obtener_clasificador');
-    
-    
-    $getRecurso= Yii::$app->getUrlManager()->createUrl('rendicion/get-recurso');
 ?>            
             
 <script>
@@ -141,37 +199,6 @@ $( document ).ready(function() {
     
     
 });
-    function GetRecurso(clasificador)
-    {
-       if(clasificador != 0)
-       {
-        $.ajax({
-                    url: '<?= $getRecurso ?>',
-                    type: 'GET',
-                    async: true,
-                    data: {clasificador:clasificador,user:user},
-                    success: function(data){
-                        $("#detalle").html(data);
-                        $('.numerico').keypress(function (e) {
-			    tecla = (document.all) ? e.keyCode : e.which; // 2
-			    if (tecla==8) return true; // 3
-			    var reg = /^[0-9\s]+$/;
-			    te = String.fromCharCode(tecla); // 5
-			    return reg.test(te); // 6
-				    
-			});		
-			    
-			$('.texto').keypress(function(e) {
-			    tecla = (document.all) ? e.keyCode : e.which; // 2
-			    if (tecla==8) return true; // 3
-			    var reg = /^[a-zA-ZáéíóúàèìòùÀÈÌÒÙÁÉÍÓÚñÑüÜ'_\s]+$/;
-			    te = String.fromCharCode(tecla); // 5
-			    return reg.test(te); // 6
-			});
-                    }
-                });
-        }
-    }
     
     function descripcion(tr)
     {
@@ -672,29 +699,5 @@ $( document ).ready(function() {
         }
         
         
-    });
-    
-    $('.numerico').keypress(function (e) {
-	tecla = (document.all) ? e.keyCode : e.which; // 2
-	if (tecla==8) return true; // 3
-        var reg = /^[0-9\s]+$/;
-        te = String.fromCharCode(tecla); // 5
-	return reg.test(te); // 6
-		
-    });		
-	
-    $('.texto').keypress(function(e) {
-	tecla = (document.all) ? e.keyCode : e.which; // 2
-	if (tecla==8) return true; // 3
-        var reg = /^[a-zA-ZáéíóúàèìòùÀÈÌÒÙÁÉÍÓÚñÑüÜ'_\s]+$/;
-        te = String.fromCharCode(tecla); // 5
-	return reg.test(te); // 6
-    });
-    $(document).ready(function(){
-    $(".collapse").on('show.bs.collapse',function(e){
-	$(this).parent().find(".glyphicon-plus").removeClass("glyphicon-plus").addClass("glyphicon-minus");
-    }).on('hidden.bs.collapse', function(){
-	$(this).parent().find(".glyphicon-minus").removeClass("glyphicon-minus").addClass("glyphicon-plus");
-    });
     });
 </script>

@@ -33,6 +33,7 @@ class DetalleRendicion extends \yii\db\ActiveRecord
     public $detalle_ids;
     public $observacion;
     public $archivos;
+    public $recursos;
     public static function tableName()
     {
         return 'detalle_rendicion';
@@ -44,7 +45,7 @@ class DetalleRendicion extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id_rendicion', 'id_clasificador', 'id_recurso', 'mes', 'anio'], 'integer'],
+            [['id_rendicion', 'id_clasificador', 'id_recurso', 'mes', 'anio','recursos'], 'integer'],
             [['precio_unit', 'total', 'cantidad'], 'number'],
             [['clasificador_id','id_ren','respuesta_aprob','detalle_ids','observacion'],'safe'],
             [['razon_social'], 'string', 'max' => 200],
@@ -81,5 +82,25 @@ class DetalleRendicion extends \yii\db\ActiveRecord
     public function getIdRendicion()
     {
         return $this->hasOne(Rendicion::className(), ['id' => 'id_rendicion']);
+    }
+    
+    public function GetMes($mes)
+    {
+        switch($mes)
+        {
+            case 1: $des_mes = "Enero"; break;
+            case 2: $des_mes = "Febrero"; break;
+            case 3: $des_mes = "Marzo"; break;
+            case 4: $des_mes = "Abril"; break;
+            case 5: $des_mes = "Mayo"; break;
+            case 6: $des_mes = "Junio"; break;
+            case 7: $des_mes = "Julio"; break;
+            case 8: $des_mes = "Agosto"; break;
+            case 9: $des_mes = "Setiembre"; break;
+            case 10: $des_mes = "Octubre"; break;
+            case 11: $des_mes = "Noviembre"; break;
+            case 12: $des_mes = "Diciembre"; break;
+        }
+        return $des_mes;
     }
 }

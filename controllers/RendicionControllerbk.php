@@ -330,7 +330,7 @@ class RendicionController extends Controller
         }
     }
     
-    /*
+    
     public function actionDetalle()
     {
         $this->layout='principal';
@@ -339,21 +339,37 @@ class RendicionController extends Controller
         
         $model = new DetalleRendicion();
         
+        //svar_dump($model->load(Yii::$app->request->post()));
         if ($model->load(Yii::$app->request->post()))
         {
             $countregistros = count(array_filter($model->clasificador_id));
+            
+            //var_dump($countregistros);die;
             
             $hoy = getdate();
             
             $desembolsos = SolicitudDesembolso::find()
                             ->where('estado = 1 and id_user = :id_user',[':id_user'=>Yii::$app->user->identity->id])
-                            ->one();             
+                            ->one();
+           // var_dump($desembolsos->id);die;                
                         $rendicion=new Rendicion();
                         $rendicion->id_user= Yii::$app->user->identity->id;
                         $rendicion->fecha= $hoy['year'].'-'.$hoy['mon'].'-'.$hoy['mday'];
                         $rendicion->id_solicitud = $desembolsos->id;
                         $rendicion->save();
             
+                    /*if($model->detalle_ids[$i] != '')
+                    {
+                        $Colaborador=Aportante::findOne($proyecto->colaboradores_ids[$i]);
+                        $Colaborador->id_proyecto=$proyecto->id;
+                        $Colaborador->colaborador=$proyecto->aportante_colaborador[$i];
+                        $Colaborador->regimen=$proyecto->aportante_regimen[$i];
+                        $Colaborador->tipo_inst=$proyecto->aportante_tipo_inst[$i];
+                        $Colaborador->tipo=3;
+                        $Colaborador->update(); 
+                    }
+                    else
+                    {*/
                     for($i=0;$i<$countregistros;$i++)
                     {
                         $recurso = Recurso::findOne($model->descripcion[$i]);
@@ -372,9 +388,13 @@ class RendicionController extends Controller
                         $detRendicion->razon_social=$model->razon_social[$i];
                         $detRendicion->save();
                         
-                         $programado = RecursoProgramado::find()
+                        //var_dump($model->clasificador_id[$i].'-'.$model->mes[$i].'-'.$model->anio[$i].'-'.$model->cantidad[$i].'-'.$model->precio_unit[$i].'-'.($model->cantidad[$i] * $model->precio_unit[$i]).'-'.$model->ruc[$i].'-'.$model->razon_social[$i]);die;
+                        //var_dump([':id_recurso'=>$detRendicion->id_recurso,':anio'=>$detRendicion->anio,':mes'=>$detRendicion->mes]);die;
+                        $programado = RecursoProgramado::find()
                                         ->where('recurso_programado.id_recurso = :id_recurso and recurso_programado.anio = :anio and recurso_programado.mes = :mes',[':id_recurso'=>$detRendicion->id_recurso,':anio'=>$detRendicion->anio,':mes'=>$detRendicion->mes])
                                         ->one();
+                        
+                        //var_dump($programado->cant_rendida);die;
                         $programado->cant_rendida = ($programado->cant_rendida + $detRendicion->cantidad);
                         $programado->precio_unit_rendido = $detRendicion->precio_unit;
                         if($programado->cant_rendida == $programado->cantidad)
@@ -386,7 +406,9 @@ class RendicionController extends Controller
                         $totales += $detRendicion->total;
                         
                         
-                    }$model->archivos = UploadedFile::getInstances($model, 'archivos');
+                    }
+                    //var_dump($_FILES);die;
+                    $model->archivos = UploadedFile::getInstances($model, 'archivos');
                     foreach ($model->archivos as $file) {
                         $archivo=new RendicionArchivo;
                         $archivo->fecha_registro=date("Y-m-d H:i:s");
@@ -397,7 +419,14 @@ class RendicionController extends Controller
                         $archivo->archivo=$archivo->id. '.' . $file->extension;
                         $archivo->update();
                         $file->saveAs('archivos/' . $archivo->id . '.' . $file->extension);
+                        //$file->saveAs('uploads/' . $file->baseName . '.' . $file->extension);
                     }
+                    //var_dump($model->archivos);
+                    //die;
+                   /*$desem = SolicitudDesembolso::findOne($desembolsos->id);
+                   $desem->total_pendiente = ($desem->total_pendiente - $totales);
+                   $desem->update();*/
+                    //}
                     
             return $this->redirect('index');
             
@@ -405,7 +434,7 @@ class RendicionController extends Controller
         else
         {
           $clasificadores = RecursoProgramado::find()
-                            ->select('recurso.clasificador_id, maestros.descripcion')
+                        ->select('recurso.clasificador_id, maestros.descripcion')
                                 ->innerJoin('recurso','recurso.id=recurso_programado.id_recurso')
                                 ->innerJoin('aportante','aportante.id=recurso.fuente')
                                 ->innerJoin('maestros','maestros.id=recurso.clasificador_id')
@@ -416,107 +445,18 @@ class RendicionController extends Controller
                                 ->where('proyecto.estado = 1 and proyecto.user_propietario=:user_propietario and aportante.tipo = 1 and recurso_programado.estado = 1 and recurso_programado.cantidad > 0  ',[':user_propietario'=>Yii::$app->user->identity->id])
                                 ->groupBy(['recurso.clasificador_id'])
                                 ->all();
+                                
+                               // var_dump($clasificadores);die;
         }
         
         return $this->render('detalle',['clasificadores'=>$clasificadores]);
-    }
-    */
-    
-    public function actionDetalle()
-    {
-        $this->layout='principal';
-        
-        $totales = 0;
-        
-        $model = new DetalleRendicion();
-        
-        if ($model->load(Yii::$app->request->post()))
-        {
-            $countregistros = count(array_filter($model->ruc));
-            
-            $hoy = getdate();
-            
-            $desembolsos = SolicitudDesembolso::find()
-                            ->where('estado = 1 and id_user = :id_user',[':id_user'=>Yii::$app->user->identity->id])
-                            ->one();             
-                        $rendicion=new Rendicion();
-                        $rendicion->id_user= Yii::$app->user->identity->id;
-                        $rendicion->fecha= $hoy['year'].'-'.$hoy['mon'].'-'.$hoy['mday'];
-                        $rendicion->id_solicitud = $desembolsos->id;
-                        $rendicion->save();
-            
-                    for($i=0;$i<$countregistros;$i++)
-                    {
-                        $recurso = Recurso::findOne($model->recursos[$i]);
-                        
-                        $detRendicion=new DetalleRendicion();
-                        $detRendicion->id_rendicion = $rendicion->id;
-                        $detRendicion->id_clasificador= $model->clasificador_id[$i];
-                        $detRendicion->id_recurso=$recurso->id;
-                        $detRendicion->descripcion=$recurso->detalle;
-                        $detRendicion->mes=$model->mes[$i];
-                        $detRendicion->anio=$model->anio[$i];
-                        $detRendicion->cantidad=$model->cantidad[$i];
-                        $detRendicion->precio_unit=$model->precio_unit[$i];
-                        $detRendicion->total= ($model->cantidad[$i] * $model->precio_unit[$i]);
-                        $detRendicion->ruc=$model->ruc[$i];
-                        $detRendicion->razon_social=$model->razon_social[$i];
-                        $detRendicion->save();
-                        
-                         $programado = RecursoProgramado::find()
-                                        ->where('recurso_programado.id_recurso = :id_recurso and recurso_programado.anio = :anio and recurso_programado.mes = :mes',[':id_recurso'=>$detRendicion->id_recurso,':anio'=>$detRendicion->anio,':mes'=>$detRendicion->mes])
-                                        ->one();
-                        $programado->cant_rendida = ($programado->cant_rendida + $detRendicion->cantidad);
-                        $programado->precio_unit_rendido = $detRendicion->precio_unit;
-                        if($programado->cant_rendida == $programado->cantidad)
-                        {
-                          $programado->estado = 2;  
-                        }
-                        $programado->update();
-                        
-                        $totales += $detRendicion->total;
-                        
-                        
-                    }$model->archivos = UploadedFile::getInstances($model, 'archivos');
-                    foreach ($model->archivos as $file) {
-                        $archivo=new RendicionArchivo;
-                        $archivo->fecha_registro=date("Y-m-d H:i:s");
-                        $archivo->estado=1;
-                        $archivo->rendicion_id=$rendicion->id;
-                        $archivo->save();
-                        
-                        $archivo->archivo=$archivo->id. '.' . $file->extension;
-                        $archivo->update();
-                        $file->saveAs('archivos/' . $archivo->id . '.' . $file->extension);
-                    }
-                    
-            return $this->redirect('index');
-            
-        }
-        else
-        {
-          $clasificadores = RecursoProgramado::find()
-                            ->select('recurso.clasificador_id, maestros.descripcion')
-                                ->innerJoin('recurso','recurso.id=recurso_programado.id_recurso')
-                                ->innerJoin('aportante','aportante.id=recurso.fuente')
-                                ->innerJoin('maestros','maestros.id=recurso.clasificador_id')
-                                ->innerJoin('actividad','actividad.id=recurso.actividad_id')
-                                ->innerJoin('indicador','indicador.id=actividad.id_ind')
-                                ->innerJoin('objetivo_especifico','objetivo_especifico.id=indicador.id_oe')
-                                ->innerJoin('proyecto','proyecto.id=objetivo_especifico.id_proyecto')
-                                ->where('proyecto.estado = 1 and proyecto.user_propietario=:user_propietario and aportante.tipo = 1 and recurso_programado.estado = 1 and recurso_programado.cantidad > 0  ',[':user_propietario'=>Yii::$app->user->identity->id])
-                                ->groupBy(['recurso.clasificador_id'])
-                                ->all();
-        }
-        
-        return $this->render('detalle',['clasificadores'=>$clasificadores,'model'=>$model]);
     }
     
     
     public function actionObtener_descripcion_recurso($clasificador,$user)
     {
         $option = '<option value="0">--Seleccione--</option>';
-        $descripcion = RecursoProgramado::find()
+       $descripcion = RecursoProgramado::find()
                         ->select('recurso.id, recurso.detalle')
                                 ->innerJoin('recurso','recurso.id=recurso_programado.id_recurso')
                                 ->innerJoin('aportante','aportante.id=recurso.fuente')
@@ -535,72 +475,6 @@ class RendicionController extends Controller
         }
         
         echo $option;
-    }
-    
-    
-    public function actionGetRecurso($clasificador,$user)
-    {
-        $tabla =    '<table class="table borderless table-hover">
-                    <thead>
-                        <th>Recurso</th>
-                        <th>Año</th>
-                        <th>Mes</th>
-                        <th>P. Unitario</th>
-                        <th>Cantidad</th>
-                        <th>Ruc</th>
-                        <th>Razón</th>
-                        <th>Total</th>
-                    </thead>';
-        $recursos = RecursoProgramado::find()
-                        ->select('recurso.id as recurso_id, recurso.detalle,recurso_programado.anio,recurso_programado.mes,recurso_programado.precio_unit, (recurso_programado.cantidad - recurso_programado.cant_rendida) as cantidad')
-                                ->innerJoin('recurso','recurso.id=recurso_programado.id_recurso')
-                                ->innerJoin('aportante','aportante.id=recurso.fuente')
-                                ->innerJoin('maestros','maestros.id=recurso.clasificador_id')
-                                ->innerJoin('actividad','actividad.id=recurso.actividad_id')
-                                ->innerJoin('indicador','indicador.id=actividad.id_ind')
-                                ->innerJoin('objetivo_especifico','objetivo_especifico.id=indicador.id_oe')
-                                ->innerJoin('proyecto','proyecto.id=objetivo_especifico.id_proyecto')
-                                ->where('proyecto.estado = 1 and proyecto.user_propietario=:user_propietario and aportante.tipo = 1 and recurso_programado.estado = 1 and recurso_programado.cantidad > 0  and recurso.clasificador_id = :clasificador_id',[':user_propietario'=>$user,':clasificador_id'=>$clasificador])
-                                ->groupBy('recurso_id,recurso.detalle,recurso_programado.anio,recurso_programado.mes')
-                                ->all();
-        $i=0;   
-        foreach($recursos as $recurso)
-        {
-           $tabla .= '<tr>
-                        <td>'.$recurso->detalle.' <input type="hidden" name="DetalleRendicion[recursos][]" value="'.$recurso->recurso_id.'"></td>
-                        <td>'.$recurso->anio.' <input type="hidden" name="DetalleRendicion[anio][]" value="'.$recurso->anio.'"></td>
-                        <td>'.$recurso->GetMes($recurso->mes).' <input type="hidden" name="DetalleRendicion[mes][]" value="'.$recurso->mes.'"></td>
-                        <td><input onkeyup="calcular_total('.$i.')" type="text" id="detallerendicion-precio_unit_'.$i.'" class="form-control decimal" name="DetalleRendicion[precio_unit][]" placeholder="" value="'.$recurso->precio_unit.'" /></td>
-                        <td><input onkeyup="calcular_total('.$i.')" type="text" id="detallerendicion-cantidad_'.$i.'" class="form-control entero" name="DetalleRendicion[cantidad][]" placeholder=""  value="'.$recurso->cantidad.'"/></td>
-                        <td><input type="text" id="detallerendicion-ruc_'.$i.'" class="form-control entero numerico" name="DetalleRendicion[ruc][]" placeholder=""  maxlength="12"/></td>
-                        <td><input type="text" id="detallerendicion-razon_social_'.$i.'" class="form-control texto" name="DetalleRendicion[razon_social][]" placeholder=""  /></td>
-                        <td><input type="text" id="detallerendicion-total_'.$i.'" class="form-control" name="DetalleRendicion[total][]" placeholder=""  Disabled value="'.$recurso->cantidad*$recurso->precio_unit.'"></td>
-                    </tr>';
-            $i++;
-        }
-        
-        $tabla.='</table>';
-        echo $tabla;
-    }
-    
-    public function GetMes($mes)
-    {
-        switch($mes)
-        {
-            case 1: $des_mes = "Enero"; break;
-            case 2: $des_mes = "Febrero"; break;
-            case 3: $des_mes = "Marzo"; break;
-            case 4: $des_mes = "Abril"; break;
-            case 5: $des_mes = "Mayo"; break;
-            case 6: $des_mes = "Junio"; break;
-            case 7: $des_mes = "Julio"; break;
-            case 8: $des_mes = "Agosto"; break;
-            case 9: $des_mes = "Setiembre"; break;
-            case 10: $des_mes = "Octubre"; break;
-            case 11: $des_mes = "Noviembre"; break;
-            case 12: $des_mes = "Diciembre"; break;
-        }
-        return $des_mes;
     }
     
     public function actionObtener_anio_repro($id_des,$clasificador,$user)
@@ -631,7 +505,7 @@ class RendicionController extends Controller
     public function actionObtener_mes_repro($anio,$id_des,$clasificador,$user)
     {
         $option = '<option value="0">--Seleccione--</option>';
-        $mes = RecursoProgramado::find()
+       $mes = RecursoProgramado::find()
                         ->select('recurso_programado.mes')
                                 ->innerJoin('recurso','recurso.id=recurso_programado.id_recurso')
                                 ->innerJoin('aportante','aportante.id=recurso.fuente')

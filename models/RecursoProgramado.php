@@ -22,7 +22,7 @@ class RecursoProgramado extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
-    
+    public $recurso_id;
     public $cantidad2;
     public $solicita;
     public $clasificador_id;
