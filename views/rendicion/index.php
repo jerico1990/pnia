@@ -2,13 +2,21 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
-
+use yii\widgets\LinkPager;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\RendicionSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+
 $this->title = Yii::t('app', 'Lista de Rendiciones');
 $this->params['breadcrumbs'][] = $this->title;
+
+
+$floor = 1;
+if (isset($_GET['page']) >= 2)
+    $floor += ($rendiciones['pages']->pageSize * $_GET['page']) - $rendiciones['pages']->pageSize;
+
+    
 ?>
 <div class="rendicion-index">
 
@@ -24,7 +32,55 @@ $this->params['breadcrumbs'][] = $this->title;
    
    <div class="col-md-2"></div>
    <div class="col-md-10">
-    <?= GridView::widget([
+    <table class="table">
+        <thead>
+            <th>Nro Rendición</th>
+            <th>Nro de Desembolso</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th></th>
+            <th>Monto Rendido</th>
+        </thead>
+        <tbody>
+            <?php $total=0;?>
+            <?php foreach($rendiciones['rendiciones'] as $rendicion){?>
+            <tr>
+                <td><?= $rendicion["id"] ?></td>
+                <td><?= $rendicion["id_solicitud"] ?></td>
+                <td><?= $rendicion["fecha"] ?></td>
+                <td>
+                    <?php 
+                    if($rendicion["estado"] == 2 ){echo "<span style='color:green;'><strong>Aprobado</strong><span>"; }
+                    if($rendicion["estado"] == 0 ){echo "<span style='color:blue;'><strong>Registrado</strong><span>"; }
+                    if($rendicion["estado"] == 3 ){echo "<span style='color:red;'><strong>Rechazado</strong><span>"; }
+                    ?>
+                </td>
+                <td>
+                    <a class="btn btn-primary btn-xs ver" href="/pnia/web/rendicion/view?id=<?= $rendicion["id"] ?>" title="Ver Desembolso"><span class="fa fa-search">Ver</span></a>
+                </td>
+                <td>
+                    <?php  //echo $rendicion["total"];
+                    if($rendicion["estado"] == 2 ){echo $rendicion["total"]; $total=$total+$rendicion["total"];}
+                    ?>
+                    
+                </td>
+            </tr>
+            <?php } ?>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5">Total</td>
+                <td><?= $total?></td>
+            </tr>
+        </tfoot>
+    </table>
+    <?= LinkPager::widget([
+            'pagination' => $rendiciones['pages'],
+            'lastPageLabel' => true,
+            'firstPageLabel' => true
+        ]);?>
+    
+    <?php /*= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
@@ -45,14 +101,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     if($data->estado == 0 ){return "<span style='color:blue;'><strong>Registrado</strong><span>"; }
                     if($data->estado == 3 ){return "<span style='color:red;'><strong>Rechazado</strong><span>"; }
                     //if($data->estado == 2 ){return "<span style='color:green;'><strong>Completo</strong><span>"; }
-                /*return  '<select id="accion_'.$data->id.'" class="form-control" onchange="ValorProyecto('.$data->id.')">
-                            <option value=0>--Selec. Opción--</option>
-                            <option value=4>Datos Generales</option>
-                            <option value=5>Financiamiento</option>
-                            <option value=6>Objetivos e Indicadores</option>
-                            <option value=7>Actividades</option>
-                            <option value=9>Recursos</option>
-                        </select>';*/
+               
                             
                     
                 },
@@ -75,7 +124,9 @@ $this->params['breadcrumbs'][] = $this->title;
              
              ],
         ],
-    ]); ?>
+    ]); */ ?>
+   
+   
     </div>
     <div class="col-md-1"></div>
 </div>

@@ -19,20 +19,17 @@ class ObjetivoeController extends Controller
     
     public function behaviors()
     {
-         return [
+        return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['grabar'],
                 'rules' => [
                     [
-                        'actions' => ['grabar'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
                 ],
             ],
         ];
-
     }
     
     public function actionIndex()

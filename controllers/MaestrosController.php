@@ -22,6 +22,27 @@ use app\models\Maestros;
 
 class MaestrosController extends Controller
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'],
+                ],
+            ],
+        ];
+    }
+    
     public function actionDependencia($unidadejecutora)
     {
         $option = '<option value="0">--Seleccione--</option>';

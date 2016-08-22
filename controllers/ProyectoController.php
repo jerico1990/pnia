@@ -37,20 +37,17 @@ class ProyectoController extends Controller
     
     public function behaviors()
     {
-         return [
+        return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index','view','actividad','objetivo_indicador','observaciones','marcologico','datosgenerales','recursos'],
                 'rules' => [
                     [
-                        'actions' => ['index','view','actividad','objetivo_indicador','observaciones','marcologico','datosgenerales','recursos'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
                 ],
             ],
         ];
-
     }
 
     

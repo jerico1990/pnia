@@ -17,6 +17,8 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
 use app\models\RendicionArchivo;
+use yii\data\Sort;
+use yii\filters\AccessControl;
 /**
  * RendicionController implements the CRUD actions for Rendicion model.
  */
@@ -25,6 +27,15 @@ class RendicionController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -41,7 +52,10 @@ class RendicionController extends Controller
     public function actionIndex()
     {
         $this->layout='principal';
-        
+        $sort = new Sort([
+            'attributes' => [
+            ],
+        ]);
 
         if(!empty($_REQUEST["id"]))
         {
@@ -59,10 +73,13 @@ class RendicionController extends Controller
         $id = 0;
         $searchModel = new RendicionSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams,$id,$user);
-
+        $model=new Rendicion;
+        $rendiciones = $model->getRendiciones($sort->orders,$id,$user);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'model'=>$model,
+            'rendiciones'=>$rendiciones
         ]);
     }
 
@@ -83,7 +100,7 @@ class RendicionController extends Controller
         //svar_dump($model->load(Yii::$app->request->post()));
         if ($model->load(Yii::$app->request->post()))
         {
-
+            //var_dump($_POST);die;
             $countregistros = count(array_filter($model->anio));
              //var_dump($countregistros);
              //var_dump($model->respuesta_aprob);die;  
@@ -214,15 +231,30 @@ class RendicionController extends Controller
         else
         {
             $rendicion = Rendicion::findOne($id);
-          $detRendicion =  DetalleRendicion::find()->where('id_rendicion = :id_rendicion',[':id_rendicion'=>$id])->all();
+            $detRendicion =  DetalleRendicion::find()->where('id_rendicion = :id_rendicion',[':id_rendicion'=>$id])->all();
           
-          $clasif = Maestros::find()
+            $clasif = Maestros::find()
                                 ->where('id_padre = 32 and estado = 1')
                                 ->orderBy('orden')
                                 ->all();
           
-          $clasificadores = RecursoProgramado::find()
-                        ->select('recurso.clasificador_id, maestros.descripcion')
+            $clasificadores = RecursoProgramado::find()
+                                ->select('recurso.clasificador_id, maestros.descripcion')
+                                ->innerJoin('recurso','recurso.id=recurso_programado.id_recurso')
+                                ->innerJoin('aportante','aportante.id=recurso.fuente')
+                                ->innerJoin('maestros','maestros.id=recurso.clasificador_id')
+                                ->innerJoin('actividad','actividad.id=recurso.actividad_id')
+                                ->innerJoin('indicador','indicador.id=actividad.id_ind')
+                                ->innerJoin('objetivo_especifico','objetivo_especifico.id=indicador.id_oe')
+                                ->innerJoin('proyecto','proyecto.id=objetivo_especifico.id_proyecto')
+                                ->innerJoin('detalle_rendicion','detalle_rendicion.id_recurso=recurso.id')
+                                ->where('proyecto.estado = 1 and aportante.tipo = 1 and recurso_programado.estado = 1 and recurso_programado.cantidad > 0  ')
+                                ->groupBy(['recurso.clasificador_id'])
+                                ->all();
+            /*if(!$clasificadores)
+            {
+                $clasificadores = RecursoProgramado::find()
+                                ->select('recurso.clasificador_id, maestros.descripcion')
                                 ->innerJoin('recurso','recurso.id=recurso_programado.id_recurso')
                                 ->innerJoin('aportante','aportante.id=recurso.fuente')
                                 ->innerJoin('maestros','maestros.id=recurso.clasificador_id')
@@ -233,8 +265,9 @@ class RendicionController extends Controller
                                 ->where('proyecto.estado = 1 and proyecto.user_propietario=:user_propietario and aportante.tipo = 1 and recurso_programado.estado = 1 and recurso_programado.cantidad > 0  ',[':user_propietario'=>Yii::$app->user->identity->id])
                                 ->groupBy(['recurso.clasificador_id'])
                                 ->all();
-                                
-                               // var_dump($clasificadores);die;
+            }*/
+            
+            
             $proyecto = Proyecto::find()
                         ->where('estado = 1 and user_propietario =:user_propietario',[':user_propietario'=>$rendicion->id_user])
                         ->one();
@@ -261,7 +294,7 @@ class RendicionController extends Controller
             
         }
         
-        return $this->render('view',['clasificadores'=>$clasificadores,'detRendicion'=>$detRendicion,'clasif'=>$clasif,'rendicion'=>$rendicion,'user_aprueba'=>$user_aprueba,'estado_aprueba'=>$estado_aprueba]);
+        return $this->render('view',['clasificadores'=>$clasificadores,'detRendicion'=>$detRendicion,'clasif'=>$clasif,'rendicion'=>$rendicion,'user_aprueba'=>$user_aprueba,'estado_aprueba'=>$estado_aprueba,'model'=>$model]);
     }
 
     /**
@@ -461,9 +494,14 @@ class RendicionController extends Controller
                         $detRendicion->total= ($model->cantidad[$i] * $model->precio_unit[$i]);
                         $detRendicion->ruc=$model->ruc[$i];
                         $detRendicion->razon_social=$model->razon_social[$i];
+                        $detRendicion->tipo_documento=$model->tipos_documentos[$i];
+                        $detRendicion->nro_documento=$model->nros_documentos[$i];
+                        $detRendicion->observacion_descripcion=$model->observaciones[$i];
+                        $fecha=str_replace("/", "-", $model->fechas[$i]);
+                        $detRendicion->fecha=date("Y-m-d",strtotime($fecha));
                         $detRendicion->save();
                         
-                         $programado = RecursoProgramado::find()
+                        $programado = RecursoProgramado::find()
                                         ->where('recurso_programado.id_recurso = :id_recurso and recurso_programado.anio = :anio and recurso_programado.mes = :mes',[':id_recurso'=>$detRendicion->id_recurso,':anio'=>$detRendicion->anio,':mes'=>$detRendicion->mes])
                                         ->one();
                         $programado->cant_rendida = ($programado->cant_rendida + $detRendicion->cantidad);

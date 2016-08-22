@@ -82,23 +82,21 @@ $this->params['breadcrumbs'][] = $this->title;
                     if($data->situacion == 0 )
                     {
                         if(Yii::$app->user->identity->id_perfil == 3)
-                    { $nivelApro = 5; }
+                        { $nivelApro = 5; }
                     
-                    if(Yii::$app->user->identity->id_perfil == 4)
-                    { $nivelApro = 1; }
+                        if(Yii::$app->user->identity->id_perfil == 4)
+                        { $nivelApro = 1; }
                     
-                    $aprobacion = Aprobaciones::find()->where('estado = 1 and id_proyecto = :id_proyecto and id_nivelaprobacion = :id_nivelaprobacion',[':id_proyecto'=>$data->id,':id_nivelaprobacion'=>$nivelApro])->one();
+                        $aprobacion = Aprobaciones::find()->where('estado = 1 and id_proyecto = :id_proyecto and id_nivelaprobacion = :id_nivelaprobacion',[':id_proyecto'=>$data->id,':id_nivelaprobacion'=>$nivelApro])->one();
                     
-                    if($aprobacion)
-                    {
-                      return "<span style='color:green;'><strong>Completo</strong><span>";   
-                    }
-                    else
-                    {
-                     return "<span style='color:red;'><strong>Incompleto</strong><span>";  
-                    }
-                    
-                        
+                        if($aprobacion)
+                        {
+                            return "<span style='color:green;'><strong>Completo</strong><span>";   
+                        }
+                        else
+                        {
+                            return "<span style='color:red;'><strong>Incompleto</strong><span>";  
+                        }
                     }
                     
                     if($data->situacion == 2 ){return "<span style='color:green;'><strong>Completo</strong><span>"; }
@@ -140,6 +138,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'contentOptions'=>['style'=>'width: 120px;','class'=>'text-center'], 
                 'headerOptions'=>['class'=>'text-center'],
+                'filter' => [0=>"Incompleto",1=>"Pendiente",2=>"Completo"]
                 //'width'=>'60px',
             ],
              /*[

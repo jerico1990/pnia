@@ -214,14 +214,14 @@ class RendicionController extends Controller
         else
         {
             $rendicion = Rendicion::findOne($id);
-          $detRendicion =  DetalleRendicion::find()->where('id_rendicion = :id_rendicion',[':id_rendicion'=>$id])->all();
+            $detRendicion =  DetalleRendicion::find()->where('id_rendicion = :id_rendicion',[':id_rendicion'=>$id])->all();
           
-          $clasif = Maestros::find()
+            $clasif = Maestros::find()
                                 ->where('id_padre = 32 and estado = 1')
                                 ->orderBy('orden')
                                 ->all();
           
-          $clasificadores = RecursoProgramado::find()
+            $clasificadores = RecursoProgramado::find()
                         ->select('recurso.clasificador_id, maestros.descripcion')
                                 ->innerJoin('recurso','recurso.id=recurso_programado.id_recurso')
                                 ->innerJoin('aportante','aportante.id=recurso.fuente')
@@ -234,7 +234,7 @@ class RendicionController extends Controller
                                 ->groupBy(['recurso.clasificador_id'])
                                 ->all();
                                 
-                               // var_dump($clasificadores);die;
+                               //var_dump($clasificadores);die;
             $proyecto = Proyecto::find()
                         ->where('estado = 1 and user_propietario =:user_propietario',[':user_propietario'=>$rendicion->id_user])
                         ->one();

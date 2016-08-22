@@ -43,22 +43,19 @@ use app\models\ModificarSearch;
 class ModificarController extends Controller
 {
      public function behaviors()
-    {
-         return [
+     {
+        return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['index','modificardatosgen'],
                 'rules' => [
                     [
-                        'actions' => ['modificardatosgen','index'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
                 ],
             ],
         ];
-
-    }
+     }
 
     /**
      * Lists all Proyecto models.

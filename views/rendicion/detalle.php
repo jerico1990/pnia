@@ -5,7 +5,17 @@ use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
 use app\models\RecursoProgramado;
 ?>
+    
+    
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+  
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/jquery.webui-popover/1.2.1/jquery.webui-popover.min.css">
 
+<script src="https://cdn.jsdelivr.net/jquery.webui-popover/1.2.1/jquery.webui-popover.min.js"></script>
+  
 <h3>Nueva Rendición</h3>
 <?php $form = ActiveForm::begin(['options'=>['enctype'=>'multipart/form-data']]); ?>
 <div >
@@ -20,6 +30,7 @@ use app\models\RecursoProgramado;
     <div class="clearfix"></div>
     <div class="panel-group" id="accordion">
 	<?php $cont=0; ?>
+	<?php $b=0; ?>
 	<?php foreach($clasificadores as $clasificador){ ?>
 	<div class="panel panel-primary">
 	    <div class="panel-heading">
@@ -37,7 +48,7 @@ use app\models\RecursoProgramado;
 	    <div id="collapse<?= $cont ?>" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
 		<div class="panel-body">
 		    <?php $recursos = RecursoProgramado::find()
-                        ->select('recurso.id as recurso_id, recurso.detalle,recurso_programado.anio,recurso_programado.mes,recurso_programado.precio_unit, (recurso_programado.cantidad - recurso_programado.cant_rendida) as cantidad')
+                        ->select('objetivo_especifico.descripcion obj_des,actividad.descripcion act_des,recurso.id as recurso_id, recurso.detalle,recurso_programado.anio,recurso_programado.mes,recurso_programado.precio_unit, (recurso_programado.cantidad - recurso_programado.cant_rendida) as cantidad')
                                 ->innerJoin('recurso','recurso.id=recurso_programado.id_recurso')
                                 ->innerJoin('aportante','aportante.id=recurso.fuente')
                                 ->innerJoin('maestros','maestros.id=recurso.clasificador_id')
@@ -51,29 +62,76 @@ use app\models\RecursoProgramado;
 		    ?>
 		    <table class="table borderless table-hover">
 			<thead>
+			    <th>#</th>
 			    <th>Recurso</th>
-			    <th>Año</th>
 			    <th>Mes</th>
 			    <th>P. Unitario</th>
 			    <th>Cantidad</th>
 			    <th>Ruc</th>
 			    <th>Razón</th>
+			    <th>Tipo de documento</th>
+			    <th>Nro de documento</th>
+			    <th>Fecha</th>
 			    <th>Total</th>
+			    <th>Obervación</th>
 			</thead>
 			
 		    <?php $a=0; ?>
+		    <?php $i=1+$b; ?>
 		    <?php foreach($recursos as $recurso){ ?>
-			<tr><input type="hidden" name="DetalleRendicion[clasificador_id][]" value="<?= $clasificador->clasificador_id ?>">
-			    <td><?= $recurso->detalle ?> <input type="hidden" name="DetalleRendicion[recursos][]" value="<?= $recurso->recurso_id ?>"></td>
-			    <td><?= $recurso->anio ?> <input type="hidden" name="DetalleRendicion[anio][]" value="<?= $recurso->anio ?>"></td>
+			<tr>
+			    <input type="hidden" name="DetalleRendicion[clasificador_id][]" value="<?= $clasificador->clasificador_id ?>">
+			    <input type="hidden" name="DetalleRendicion[anio][]" value="<?= $recurso->anio ?>">
+			    <td><?= $i; ?></td>
+			    <td>
+			    <span class="popover1" data-type='html' style="cursor: pointer" data-content="Objetivo: <?= $recurso->obj_des ?><br> Actividad: <?= $recurso->act_des ?>" data-placement="top"><?= $recurso->detalle ?></span>
+			    
+			    <input type="hidden" name="DetalleRendicion[recursos][]" value="<?= $recurso->recurso_id ?>"></td>
+			    
 			    <td><?= $model->GetMes($recurso->mes) ?> <input type="hidden" name="DetalleRendicion[mes][]" value="<?= $recurso->mes ?>"></td>
 			    <td><input onkeyup="calcular_total('<?= $cont.'_'.$a ?>')" type="text" id="detallerendicion-precio_unit_<?= $cont.'_'.$a ?>" class="form-control decimal" name="DetalleRendicion[precio_unit][]" placeholder="" value="<?= $recurso->precio_unit ?>" /></td>
 			    <td><input onkeyup="calcular_total('<?= $cont.'_'.$a ?>')" type="text" id="detallerendicion-cantidad_<?= $cont.'_'.$a ?>" class="form-control entero" name="DetalleRendicion[cantidad][]" placeholder=""  value="<?= $recurso->cantidad ?>"/></td>
 			    <td><input type="text" id="detallerendicion-ruc_<?= $cont.'_'.$a ?>" class="form-control entero numerico" name="DetalleRendicion[ruc][]" placeholder=""  maxlength="12"/></td>
 			    <td><input type="text" id="detallerendicion-razon_social_<?= $cont.'_'.$a ?>" class="form-control texto" name="DetalleRendicion[razon_social][]" placeholder=""  /></td>
+			    <td><select class="form-control" name="DetalleRendicion[tipos_documentos][]">
+				<option value></option>
+				<option value=1>Factura</option>
+				<option value=2>Boleta</option>
+				<option value=3>Planilla</option>
+				<option value=4>Otras</option>
+				</select>
+			    </td>
+			    <td>
+				<input type="text" class="numerico form-control" name="DetalleRendicion[nros_documentos][]" maxlength="20">
+			    </td>
+			    <td>
+				<input type="text" class="datepicker form-control" name="DetalleRendicion[fechas][]">
+			    </td>
 			    <td><input type="text" id="detallerendicion-total_<?= $cont.'_'.$a ?>" class="form-control" name="DetalleRendicion[total][]" placeholder=""  Disabled value="<?= $recurso->cantidad*$recurso->precio_unit ?>"></td>
+			    <td>
+				<!-- Button trigger modal -->
+				<span style="cursor: pointer" class="glyphicon glyphicon-list-alt" data-toggle="modal" data-target="#myModal<?= $i?>"></span>
+				
+				<!-- Modal -->
+				<div class="modal fade" id="myModal<?= $i?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+				  <div class="modal-dialog" role="document">
+				    <div class="modal-content">
+				      <div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" id="myModalLabel">Observación</h4>
+				      </div>
+				      <div class="modal-body">
+					<textarea class="form-control" name="DetalleRendicion[observaciones][]" maxlength="5000"></textarea>
+				      </div>
+				    </div>
+				  </div>
+				</div>
+			    </td>
 			</tr>
 			<?php $a++; ?>
+			<?php $b=$i;?>
+			<?php $i++; ?>
+			
 		    <?php } ?>
 		    
 		    </table>
@@ -81,6 +139,7 @@ use app\models\RecursoProgramado;
 	    </div>
 	</div>
 	<?php $cont++ ;?>
+	
 	<?php } ?>
     </div>
     
@@ -108,7 +167,7 @@ use app\models\RecursoProgramado;
 		<tr id='archivo_addr_<?= $arc ?>'></tr>
 	    </tbody>
 	</table>
-	<div id="agregar_registro_archivo" onclick="" class="btn btn-default pull-left btn_hide" value="1">Agregar</div>
+	<div id="agregar_registro_archivo" onclick="" class="btn btn-default pull-left btn_hide" value="1">Agregar archivo</div>
 	<br>
     </div>
     <div class="clearfix"></div><br/><br/>
@@ -697,4 +756,28 @@ $( document ).ready(function() {
 	$(this).parent().find(".glyphicon-minus").removeClass("glyphicon-minus").addClass("glyphicon-plus");
     });
     });
+    $.datepicker.regional['es'] = {
+      changeMonth: true,
+      changeYear: true,
+      closeText: 'Cerrar',
+      prevText: 'Previo',
+      nextText: 'Próximo',
+      monthNames: ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+      'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
+      monthNamesShort: ['Ene','Feb','Mar','Abr','May','Jun',
+      'Jul','Ago','Sep','Oct','Nov','Dic'],
+      monthStatus: 'Ver otro mes',
+      yearRange: '2014:2020',
+      yearStatus: 'Ver otro año',
+      dayNames: ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'],
+      dayNamesShort: ['Dom','Lun','Mar','Mie','Jue','Vie','Sáb'],
+      dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','Sa'],
+      dateFormat: 'dd/mm/yy', firstDay: 0,
+      initStatus: 'Selecciona la fecha', isRTL: false};
+      $.datepicker.setDefaults($.datepicker.regional['es']);
+      
+      
+    $( ".datepicker" ).datepicker();
+    
+    $('.popover1').webuiPopover();
 </script>

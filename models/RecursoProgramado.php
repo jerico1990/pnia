@@ -29,7 +29,15 @@ class RecursoProgramado extends \yii\db\ActiveRecord
     public $descripcion;
     public $detalle;
     public $id_clasificador;
-    
+    public $obj_des;
+    public $act_des;
+    public $ruc;
+    public $razon_social;
+    public $nro_documento;
+    public $observacion_descripcion;
+    public $tipo_documento;
+    public $fecha;
+    public $detalle_id;
     public static function tableName()
     {
         return 'recurso_programado';

@@ -9,6 +9,15 @@ $config = [
     'language' => 'es-ES',
     'defaultRoute'=>'dashboard/index',
     'components' => [
+        'formatter' => [
+            'dateFormat' => 'dd.MM.yyyy',
+            'decimalSeparator' => ',',
+            'thousandSeparator' => ' ',
+            //'currencyCode' => 'EUR',
+        ],
+        'tools' => [
+            'class' => 'app\components\Tools'
+        ],
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'y_bk3BaU6A35MbMHxGvzNDDae274EP22',

@@ -9,9 +9,31 @@ use app\models\Aportante;
 use app\models\Desembolso;
 use app\models\Maestros;
 use app\models\Proyecto;
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 
 class AportanteController extends Controller
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'],
+                ],
+            ],
+        ];
+    }
     public function actionIndex()
     {
         $situacion = $_REQUEST["situation"];

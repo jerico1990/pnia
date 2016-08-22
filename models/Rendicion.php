@@ -3,7 +3,7 @@
 namespace app\models;
 use yii\web\UploadedFile;
 use Yii;
-
+use yii\db\Query;
 /**
  * This is the model class for table "rendicion".
  *
@@ -81,5 +81,49 @@ class Rendicion extends \yii\db\ActiveRecord
     public function getIdUser()
     {
         return $this->hasOne(Usuarios::className(), ['id' => 'id_user']);
+    }
+    
+    
+    public function getRendiciones($sort,$id,$user)
+    {
+        //total_equipos province   total_alumnos  district  total_equipos_nofinalizado latitude  total_alumnos_nofinalizado longitud
+        $query = new Query;
+        
+        if(Yii::$app->user->identity->id_perfil == 2)
+        {
+        //$query = Rendicion::find()->where('id_user = :id_user',[':id_user'=>Yii::$app->user->identity->id]);
+        
+        $query
+                ->select('rendicion.*,(select sum(detalle_rendicion.total) from detalle_rendicion where detalle_rendicion.id_rendicion=rendicion.id) as total')
+                ->from('rendicion')
+                ->where('id_user = :id_user',[':id_user'=>Yii::$app->user->identity->id])
+                ->orderBy($sort);
+        }
+        else
+        {
+            if($id == 1)
+            {
+                $query
+                ->select('rendicion.id_user as id, proyecto.titulo as titulo ,count(rendicion.estado) as cantidad,(select sum(detalle_rendicion.total) from detalle_rendicion where detalle_rendicion.id_rendicion=rendicion.id) as total')
+                ->from('rendicion')
+                ->innerJoin('proyecto','proyecto.user_propietario=rendicion.id_user')
+                ->where('proyecto.estado = 1 and rendicion.estado = 0 and proyecto.id_unidad_ejecutora =:id_unidad_ejecutora',[":id_unidad_ejecutora"=>Yii::$app->user->identity->ejecutora])
+                ->groupBy(['proyecto.id'])
+                ->orderBy($sort);
+            }
+            else
+            {
+                $query
+                ->select('rendicion.*,(select sum(detalle_rendicion.total) from detalle_rendicion where detalle_rendicion.id_rendicion=rendicion.id) as total')
+                ->from('rendicion')
+                ->where('estado = 0 and id_user = :id_user',[':id_user'=>$user])
+                ->orderBy($sort);
+            }
+            
+        }
+        
+        $result = Yii::$app->tools->Pagination($query,10);
+        
+        return ['rendiciones' => $result['result'], 'pages' => $result['pages']];
     }
 }

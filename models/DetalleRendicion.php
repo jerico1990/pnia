@@ -34,6 +34,10 @@ class DetalleRendicion extends \yii\db\ActiveRecord
     public $observacion;
     public $archivos;
     public $recursos;
+    public $tipos_documentos;
+    public $nros_documentos;
+    public $fechas;
+    public $observaciones;
     public static function tableName()
     {
         return 'detalle_rendicion';
@@ -52,6 +56,7 @@ class DetalleRendicion extends \yii\db\ActiveRecord
             [['descripcion'], 'string', 'max' => 3000],
             [['ruc'], 'string', 'max' => 20],
             [['archivos'], 'file', 'maxFiles' => 100],
+            [['tipos_documentos','nros_documentos','fechas','observaciones'],'safe']
         ];
     }
 

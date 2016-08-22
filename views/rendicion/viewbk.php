@@ -5,147 +5,248 @@ use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
 use app\models\Usuarios;
 
-use app\models\RecursoProgramado;
 ?>
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
-  
-  
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/jquery.webui-popover/1.2.1/jquery.webui-popover.min.css">
 
-<script src="https://cdn.jsdelivr.net/jquery.webui-popover/1.2.1/jquery.webui-popover.min.js"></script>
-  
 <h3>Nueva Rendición</h3>
 <?php $form = ActiveForm::begin(['options' => ['class' => '', ]]); ?>
 <?= \app\widgets\observacion\ObservacionWidget::widget(['maestro'=>'DetalleRendicion','titulo'=>'Motivo del Rechazo:','tipo'=>'1']); ?>
-
-
+<div id="form1" >
             <input type="hidden"  id="id" name="DetalleRendicion[id_ren]" value="<?= $rendicion->id; ?>" />
             <input type="hidden" value="" id="detallerendicion-respuesta_aprob" name="DetalleRendicion[respuesta_aprob]" /> 
-            
-	    <div>
+            <div>
 		<div class="clearfix"></div>
-                <div class="panel-group" id="accordion">
-	<?php $cont=0; ?>
-	<?php $b=0; ?>
-	<?php foreach($clasificadores as $clasificador){ ?>
-	
-	<div class="panel panel-primary">
-	    <div class="panel-heading">
-		<div class="col-md-1">
-		    <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse<?= $cont ?>" aria-expanded="false">
-			<span style="color:black" class="glyphicon glyphicon-plus"></span>
-		    </a>
-		</div>
-		<div class="col-md-8">
-		    <?= $clasificador->descripcion ?>
-		    <input type="hidden" name="">
-		</div>
-		<div class="clearfix"></div>
-	    </div>
-	    <div id="collapse<?= $cont ?>" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
-		<div class="panel-body">
-		    <?php $recursos = RecursoProgramado::find()
-                        ->select('detalle_rendicion.id as detalle_id,detalle_rendicion.fecha,detalle_rendicion.tipo_documento,detalle_rendicion.observacion_descripcion,detalle_rendicion.nro_documento,detalle_rendicion.razon_social,detalle_rendicion.ruc,objetivo_especifico.descripcion obj_des,actividad.descripcion act_des,recurso.id as recurso_id, recurso.detalle,recurso_programado.anio,recurso_programado.mes,recurso_programado.precio_unit, (recurso_programado.cantidad - recurso_programado.cant_rendida) as cantidad')
-                                ->innerJoin('recurso','recurso.id=recurso_programado.id_recurso')
-                                ->innerJoin('aportante','aportante.id=recurso.fuente')
-                                ->innerJoin('maestros','maestros.id=recurso.clasificador_id')
-                                ->innerJoin('actividad','actividad.id=recurso.actividad_id')
-                                ->innerJoin('indicador','indicador.id=actividad.id_ind')
-                                ->innerJoin('objetivo_especifico','objetivo_especifico.id=indicador.id_oe')
-                                ->innerJoin('proyecto','proyecto.id=objetivo_especifico.id_proyecto')
-				->innerJoin('detalle_rendicion','detalle_rendicion.id_recurso=recurso.id')
-                                ->where('detalle_rendicion.id_rendicion='.$rendicion->id.' and proyecto.estado = 1 and aportante.tipo = 1 and recurso_programado.estado = 1 and recurso_programado.cantidad > 0  and recurso.clasificador_id = :clasificador_id',[':clasificador_id'=>$clasificador->clasificador_id])
-                                ->groupBy('recurso_id,recurso.detalle,recurso_programado.anio,recurso_programado.mes')
-                                ->all();
-		    ?>
-		    <table class="table borderless table-hover">
-			<thead>
-			    <th>#</th>
-			    <th>Recurso</th>
-			    <th>Mes</th>
-			    <th>P. Unitario</th>
-			    <th>Cantidad</th>
-			    <th>Ruc</th>
-			    <th>Razón</th>
-			    <th>Tipo de documento</th>
-			    <th>Nro de documento</th>
-			    <th>Fecha</th>
-			    <th>Total</th>
-			    <th>Obervación</th>
-			</thead>
-			
-		    <?php $a=0; ?>
-		    <?php $i=1+$b; ?>
-		    <?php foreach($recursos as $recurso){ ?>
-			<tr>
-			    <input type="hidden" name="DetalleRendicion[detalle_ids][]" value="<?= $recurso->detalle_id; ?>" />
-			    <input type="hidden" name="DetalleRendicion[clasificador_id][]" value="<?= $clasificador->clasificador_id ?>">
-			    <input type="hidden" name="DetalleRendicion[anio][]" value="<?= $recurso->anio ?>">
-			    <?php //var_dump($recurso->anio);die; ?>
-			    <td><?= $i; ?></td>
-			    <td>
-			    <span class="popover1" data-type='html' style="cursor: pointer" data-content="Objetivo: <?= $recurso->obj_des ?><br> Actividad: <?= $recurso->act_des ?>" data-placement="top"><?= $recurso->detalle ?></span>
-			    
-			    <input type="hidden" name="DetalleRendicion[recursos][]" value="<?= $recurso->recurso_id ?>"></td>
-			    
-			    <td><?= $model->GetMes($recurso->mes) ?> <input type="hidden" name="DetalleRendicion[mes][]" value="<?= $recurso->mes ?>"></td>
-			    <td><input onkeyup="calcular_total('<?= $cont.'_'.$a ?>')" type="text" id="detallerendicion-precio_unit_<?= $cont.'_'.$a ?>" class="form-control decimal" name="DetalleRendicion[precio_unit][]" placeholder="" value="<?= $recurso->precio_unit ?>" /></td>
-			    <td><input onkeyup="calcular_total('<?= $cont.'_'.$a ?>')" type="text" id="detallerendicion-cantidad_<?= $cont.'_'.$a ?>" class="form-control entero" name="DetalleRendicion[cantidad][]" placeholder=""  value="<?= $recurso->cantidad ?>"/></td>
-			    <td><input type="text" id="detallerendicion-ruc_<?= $cont.'_'.$a ?>" class="form-control entero numerico" name="DetalleRendicion[ruc][]" placeholder=""  maxlength="12" value="<?= $recurso->ruc ?>" /></td>
-			    <td><input type="text" id="detallerendicion-razon_social_<?= $cont.'_'.$a ?>" class="form-control texto" name="DetalleRendicion[razon_social][]" placeholder=""  value="<?= $recurso->razon_social ?>" /></td>
-			    <td><select class="form-control" name="DetalleRendicion[tipos_documentos][]">
-				<option value></option>
-				<option value=1 <?= ($recurso->tipo_documento==1)?'selected':''; ?>>Factura</option>
-				<option value=2 <?= ($recurso->tipo_documento==2)?'selected':''; ?>>Boleta</option>
-				<option value=3 <?= ($recurso->tipo_documento==3)?'selected':''; ?>>Planilla</option>
-				<option value=4 <?= ($recurso->tipo_documento==4)?'selected':''; ?>>Otras</option>
-				</select>
-			    </td>
-			    <td>
-				<input type="text" class="numerico form-control" name="DetalleRendicion[nros_documentos][]" maxlength="20" value="<?= $recurso->nro_documento ?>">
-			    </td>
-			    <td>
-				<input type="text" class="datepicker form-control" name="DetalleRendicion[fechas][]" value="<?= date('d-m-Y',strtotime($recurso->fecha)) ?>">
-			    </td>
-			    <td><input type="text" id="detallerendicion-total_<?= $cont.'_'.$a ?>" class="form-control" name="DetalleRendicion[total][]" placeholder=""  Disabled value="<?= $recurso->cantidad*$recurso->precio_unit ?>"></td>
-			    <td>
-				<!-- Button trigger modal -->
-				<span style="cursor: pointer" class="glyphicon glyphicon-list-alt" data-toggle="modal" data-target="#myModal<?= $i?>"></span>
-				
-				<!-- Modal -->
-				<div class="modal fade" id="myModal<?= $i?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-				  <div class="modal-dialog" role="document">
-				    <div class="modal-content">
-				      <div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					<h4 class="modal-title" id="myModalLabel">Observación</h4>
-				      </div>
-				      <div class="modal-body">
-					<textarea class="form-control" name="DetalleRendicion[observaciones][]" maxlength="5000"><?= $recurso->observacion_descripcion ?></textarea>
-				      </div>
-				    </div>
-				  </div>
+                <div class="col-xs-12 col-sm-7 col-md-12 ">
+                    <table class="table borderless table-hover" name="DetalleRendicion[detalle_tabla]" id="detalle_tabla" border="0">
+                        <thead>
+                            <tr>
+                                <th class="text-center">
+                                    Clasificador
+                                </th>
+                                <th class="text-center">
+                                    Descripción
+                                </th>
+				<th class="text-center">
+                                    Año
+                                </th>
+				<th class="text-center">
+                                    Mes
+                                </th>
+				<th class="text-center">
+                                    P. Unitario
+                                </th>
+                                <th class="text-center">
+                                    Cantidad
+                                </th>
+                                <th class="text-center">
+                                    Ruc
+                                </th>
+                                <th class="text-center">
+                                    Razón
+                                </th>
+                                <th class="text-center">
+                                    Total
+                                </th>
+                                <th>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                              <td>
+                                Total:
+                              </td>
+                              <td>
+                                <div class="form-group field-aportante-totaltotal required">
+					    <input type="text" id="totales" class="form-control decimal"  placeholder="" value="0.00" disabled/>
 				</div>
-			    </td>
-			</tr>
-			<?php $a++; ?>
-			<?php $b=$i;?>
-			<?php $i++; ?>
-			
-		    <?php } ?>
-		    
-		    </table>
-		</div>
-	    </div>
-	</div>
-	<?php $cont++ ;?>
-	
-	<?php } ?>
-    </div>
-    
-    <?php $det=1;?>
+                              </td>
+                              <td></td>
+                            </tr>
+                      </tfoot>
+                        <tbody>
+                            <?php $det=0; ?>
+                            <?php  if($detRendicion){ ?>
+                            <?php foreach($detRendicion as $detRen){
+                                
+                                switch($detRen->mes)
+                                    {
+                                        case 1: $des_mes = "Enero"; break;
+                                        case 2: $des_mes = "Febrero"; break;
+                                        case 3: $des_mes = "Marzo"; break;
+                                        case 4: $des_mes = "Abril"; break;
+                                        case 5: $des_mes = "Mayo"; break;
+                                        case 6: $des_mes = "Junio"; break;
+                                        case 7: $des_mes = "Julio"; break;
+                                        case 8: $des_mes = "Agosto"; break;
+                                        case 9: $des_mes = "Setiembre"; break;
+                                        case 10: $des_mes = "Octubre"; break;
+                                        case 11: $des_mes = "Noviembre"; break;
+                                        case 12: $des_mes = "Diciembre"; break;
+                                    }
+                                
+                                
+                                ?>
+                                    <tr id='detalle_addr_<?= $det; ?>'>
+                                        <td>
+                                            <input type="hidden" class=" hiden_cls" name="DetalleRendicion[numero][]" id="detallerendicion-numero_<?= $det; ?>" value="<?= $det; ?>" />
+                                            <div class="form-group field-detallerendicion-id_clasificador_<?= $det; ?>  required ">
+						<select onchange="descripcion(<?= $det; ?>)" class="form-control" id="detallerendicion-id_clasificador_<?= $det; ?>" name="DetalleRendicion[clasificador_id][]" >
+                                                    <option value="0" >-Seleccionar-</option>
+                                                    <?php foreach($clasif as $clasif2){ ?>
+                                                        
+                                                        <option value="<?= $clasif2->id ?>" <?= ($clasif2->id == $detRen->id_clasificador ? 'Selected':'') ?> ><?= $clasif2->descripcion ?></option>
+                                                        
+                                                    <?php } ?>
+                                                </select>
+					    </div>
+                                            
+                                    </td>
+
+					<td class="col-xs-1">
+					    <div class="form-group field-detallerendicion-descripcion_<?= $det; ?>  required ">
+						<select onchange="anio(<?= $det; ?>)" class="form-control" id="detallerendicion-descripcion_<?= $det; ?>" name="DetalleRendicion[descripcion][]" >
+                                                    <option value="<?= $detRen->id_recurso; ?>" ><?= $detRen->descripcion; ?></option>
+                                                </select>
+					    </div>
+					</td>
+					<td class="col-xs-1">
+					    <div class="form-group field-detallerendicion-anio_<?= $det; ?>  required ">
+						<input type="hidden" class="hiden_cls" value="<?= $detRen->anio; ?>" name="DetalleRendicion[anio][]" /> 
+                                                <select onchange="mes(<?= $det; ?>)" class="form-control" id="detallerendicion-anio_<?= $det; ?>" name="DetalleRendicion[anio][]" >
+                                                    <option value="<?= $detRen->anio; ?>" ><?= $detRen->anio; ?></option>
+                                                </select>
+					    </div>
+					</td>
+					<td class="col-xs-1">
+					    <div class="form-group field-detallerendicion-mes_<?= $det; ?>  required ">
+                                            <input type="hidden" class="hiden_cls" value="<?= $detRen->mes; ?>" name="DetalleRendicion[mes][]" /> 
+						<select onchange="precio_cantidad(<?= $det; ?>)" class="form-control" id="detallerendicion-mes_<?= $det; ?>" name="DetalleRendicion[mes][]" >
+                                                    <option value="<?= $detRen->mes; ?>" ><?= $des_mes; ?></option>
+                                                </select>
+					    </div>
+					</td>
+					<td>
+                                            
+					    <div class="form-group field-detallerendicion-precio_unit_<?= $det; ?> required">
+                                            <input type="hidden" class="hiden_cls" value="<?= $detRen->precio_unit; ?>" name="DetalleRendicion[precio_unit][]" /> 
+						<input onkeyup="calcular_total(<?= $det; ?>)" type="text" id="detallerendicion-precio_unit_<?= $det; ?>" class="form-control decimal" name="DetalleRendicion[precio_unit][]" placeholder="" value="<?= $detRen->precio_unit; ?>" />
+					    </div>
+					</td>
+                                        <td>
+					    <div class="form-group field-detallerendicion-cantidad_<?= $det; ?> required">
+                                            <input type="hidden" class="hiden_cls" value="<?= $detRen->cantidad; ?>" name="DetalleRendicion[cantidad][]" /> 
+						<input onkeyup="calcular_total(<?= $det; ?>)" type="text" id="detallerendicion-cantidad_<?= $det; ?>" class="form-control entero" name="DetalleRendicion[cantidad][]" placeholder="" value="<?= $detRen->cantidad; ?>" />
+					    </div>
+					</td>
+                                        <td>
+					    <div class="form-group field-detallerendicion-ruc_<?= $det; ?> required">
+						<input type="text" id="detallerendicion-ruc_<?= $det; ?>" class="form-control entero" name="DetalleRendicion[ruc][]" placeholder="" value="<?= $detRen->ruc; ?>" />
+					    </div>
+					</td>
+                                        <td>
+					    <div class="form-group field-detallerendicion-razon_social_<?= $det; ?> required">
+						<input type="text" id="detallerendicion-razon_social_<?= $det; ?>" class="form-control" name="DetalleRendicion[razon_social][]" placeholder="" value="<?= $detRen->razon_social; ?>" />
+					    </div>
+					</td>
+                                        <td>
+					    <div class="form-group field-detallerendicion-total_<?= $det; ?> required">
+						<input type="text" id="detallerendicion-total_<?= $det; ?>" class="form-control" name="DetalleRendicion[total][]" placeholder="" value="<?= $detRen->total; ?>" Disabled>
+					    </div>
+					</td>
+					<td>
+					    <span class="eliminar glyphicon glyphicon-minus-sign" >
+					    <input type="hidden" class="hiden_cls" id="detalle_ids_<?= $det; ?>" name="DetalleRendicion[detalle_ids][]" value="<?= $detRen->id; ?>" />
+					    </span>
+					</td>
+				</tr>
+                            
+                            <?php $det++; }?>
+                            <?php }else{ ?>
+				<tr id='detalle_addr_0'>
+                                        <td>
+                                            <input type="hidden" name="DetalleRendicion[numero][]" id="detallerendicion-numero_<?= $det; ?>" value="<?= $det; ?>" />
+                                            <div class="form-group field-detallerendicion-id_clasificador_0  required ">
+						<select onchange="descripcion(<?= $det; ?>)" class="form-control" id="detallerendicion-id_clasificador_0" name="DetalleRendicion[clasificador_id][]" >
+                                                    <option value="0" >-Seleccionar-</option>
+                                                    <?php foreach($clasificadores as $clasif){ ?>
+                                                        
+                                                        <option value="<?= $clasif->clasificador_id ?>" ><?= $clasif->descripcion ?></option>
+                                                        
+                                                    <?php } ?>
+                                                </select>
+					    </div>
+                                            
+                                    </td>
+
+					<td class="col-xs-1">
+					    <div class="form-group field-detallerendicion-descripcion_0  required ">
+						<select onchange="anio(<?= $det; ?>)" class="form-control" id="detallerendicion-descripcion_0" name="DetalleRendicion[descripcion][]" >
+                                                    <option value="0" >-Seleccionar-</option>
+                                                </select>
+					    </div>
+					</td>
+					<td class="col-xs-1">
+					    <div class="form-group field-detallerendicion-anio_0  required ">
+						<select onchange="mes(<?= $det; ?>)" class="form-control" id="detallerendicion-anio_0" name="DetalleRendicion[anio][]" >
+                                                    <option value="0" >-Seleccionar-</option>
+                                                </select>
+					    </div>
+					</td>
+					<td>
+					    <div class="form-group field-detallerendicion-mes_0  required ">
+						<select onchange="precio_cantidad(<?= $det; ?>)" class="form-control" id="detallerendicion-mes_0" name="DetalleRendicion[mes][]" >
+                                                    <option value="0" >-Seleccionar-</option>
+                                                </select>
+					    </div>
+					</td>
+					<td>
+					    <div class="form-group field-detallerendicion-precio_unit_0 required">
+						<input onkeyup="calcular_total(<?= $det; ?>)" type="text" id="detallerendicion-precio_unit_0" class="form-control decimal" name="DetalleRendicion[precio_unit][]" placeholder=""  />
+					    </div>
+					</td>
+                                        <td>
+					    <div class="form-group field-detallerendicion-cantidad_0 required">
+						<input onkeyup="calcular_total(<?= $det; ?>)" type="text" id="detallerendicion-cantidad_0" class="form-control entero" name="DetalleRendicion[cantidad][]" placeholder=""  />
+					    </div>
+					</td>
+                                        <td>
+					    <div class="form-group field-detallerendicion-ruc_0 required">
+						<input type="text" id="detallerendicion-ruc_0" class="form-control entero" name="DetalleRendicion[ruc][]" placeholder=""  />
+					    </div>
+					</td>
+                                        <td>
+					    <div class="form-group field-detallerendicion-razon_social_0 required">
+						<input type="text" id="detallerendicion-razon_social_0" class="form-control" name="DetalleRendicion[razon_social][]" placeholder=""  />
+					    </div>
+					</td>
+                                        <td>
+					    <div class="form-group field-detallerendicion-total_0 required">
+						<input type="text" id="detallerendicion-total_0" class="form-control" name="DetalleRendicion[total][]" placeholder=""  Disabled>
+					    </div>
+					</td>
+					<td>
+					    <span class="eliminar glyphicon glyphicon-minus-sign" onclick="eliminarind(<?= $det ?>)">
+					    <input type="hidden" id="detalle_ids_0" name="DetalleRendicion[detalle_ids][]" value="" />
+					    </span>
+					</td>
+				</tr>
+				<?php $det=1; ?>
+			    <?php } ?>
+                            <tr id='detalle_addr_<?= $det ?>'></tr>
+                        </tbody>
+                    </table>
+                   <!-- <div >
+                    <button type="button" id="agregar_registro" class="btn btn-default pull-left btn_hide" >Agregar</button>
+                    </div>-->
+                    <br>
+                </div>
                 
                 <?php
                     if($rendicion->observacion != null){
@@ -234,6 +335,7 @@ use app\models\RecursoProgramado;
                 
 
 
+</div>
 <?php ActiveForm::end(); ?>
 <?php
 
@@ -702,14 +804,5 @@ $('#detalle_tabla  td:nth-child(10)').hide();
             
             
         } 
-    });
-    $('.popover1').webuiPopover();
-    
-    $(document).ready(function(){
-    $(".collapse").on('show.bs.collapse',function(e){
-	$(this).parent().find(".glyphicon-plus").removeClass("glyphicon-plus").addClass("glyphicon-minus");
-    }).on('hidden.bs.collapse', function(){
-	$(this).parent().find(".glyphicon-minus").removeClass("glyphicon-minus").addClass("glyphicon-plus");
-    });
     });
 </script>
