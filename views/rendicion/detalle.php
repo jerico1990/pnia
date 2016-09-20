@@ -73,7 +73,7 @@ use app\models\RecursoProgramado;
 			    <th>Nro de documento</th>
 			    <th>Fecha</th>
 			    <th>Total</th>
-			    <th>Obervación</th>
+			    <th>Observación</th>
 			</thead>
 			
 		    <?php $a=0; ?>
@@ -81,19 +81,19 @@ use app\models\RecursoProgramado;
 		    <?php foreach($recursos as $recurso){ ?>
 			<tr>
 			    <input type="hidden" name="DetalleRendicion[clasificador_id][]" value="<?= $clasificador->clasificador_id ?>">
-			    <input type="hidden" name="DetalleRendicion[anio][]" value="<?= $recurso->anio ?>">
+			    <input type="hidden" name="DetalleRendicion[anio][<?= $clasificador->clasificador_id ?>][]" value="<?= $recurso->anio ?>">
 			    <td><?= $i; ?></td>
 			    <td>
 			    <span class="popover1" data-type='html' style="cursor: pointer" data-content="Objetivo: <?= $recurso->obj_des ?><br> Actividad: <?= $recurso->act_des ?>" data-placement="top"><?= $recurso->detalle ?></span>
 			    
-			    <input type="hidden" name="DetalleRendicion[recursos][]" value="<?= $recurso->recurso_id ?>"></td>
+			    <input type="hidden" name="DetalleRendicion[recursos][<?= $clasificador->clasificador_id ?>][]" value="<?= $recurso->recurso_id ?>"></td>
 			    
-			    <td><?= $model->GetMes($recurso->mes) ?> <input type="hidden" name="DetalleRendicion[mes][]" value="<?= $recurso->mes ?>"></td>
-			    <td><input onkeyup="calcular_total('<?= $cont.'_'.$a ?>')" type="text" id="detallerendicion-precio_unit_<?= $cont.'_'.$a ?>" class="form-control decimal" name="DetalleRendicion[precio_unit][]" placeholder="" value="<?= $recurso->precio_unit ?>" /></td>
-			    <td><input onkeyup="calcular_total('<?= $cont.'_'.$a ?>')" type="text" id="detallerendicion-cantidad_<?= $cont.'_'.$a ?>" class="form-control entero" name="DetalleRendicion[cantidad][]" placeholder=""  value="<?= $recurso->cantidad ?>"/></td>
-			    <td><input type="text" id="detallerendicion-ruc_<?= $cont.'_'.$a ?>" class="form-control entero numerico" name="DetalleRendicion[ruc][]" placeholder=""  maxlength="12"/></td>
-			    <td><input type="text" id="detallerendicion-razon_social_<?= $cont.'_'.$a ?>" class="form-control texto" name="DetalleRendicion[razon_social][]" placeholder=""  /></td>
-			    <td><select class="form-control" name="DetalleRendicion[tipos_documentos][]">
+			    <td><?= $model->GetMes($recurso->mes) ?> <input type="hidden" name="DetalleRendicion[mes][<?= $clasificador->clasificador_id ?>][]" value="<?= $recurso->mes ?>"></td>
+			    <td><input onkeyup="calcular_total('<?= $cont.'_'.$a ?>')" type="text" id="detallerendicion-precio_unit_<?= $cont.'_'.$a ?>" class="form-control decimal" name="DetalleRendicion[precio_unit][<?= $clasificador->clasificador_id ?>][]" placeholder="" value="<?= $recurso->precio_unit ?>" /></td>
+			    <td><input onkeyup="calcular_total('<?= $cont.'_'.$a ?>')" type="text" id="detallerendicion-cantidad_<?= $cont.'_'.$a ?>" class="form-control entero" name="DetalleRendicion[cantidad][<?= $clasificador->clasificador_id ?>][]" placeholder=""  value="<?= $recurso->cantidad ?>"/></td>
+			    <td><input type="text" id="detallerendicion-ruc_<?= $cont.'_'.$a ?>" class="form-control entero numerico" name="DetalleRendicion[ruc][<?= $clasificador->clasificador_id ?>][]" placeholder=""  maxlength="12"/></td>
+			    <td><input type="text" id="detallerendicion-razon_social_<?= $cont.'_'.$a ?>" class="form-control texto" name="DetalleRendicion[razon_social][<?= $clasificador->clasificador_id ?>][]" placeholder=""  /></td>
+			    <td><select class="form-control" name="DetalleRendicion[tipos_documentos][<?= $clasificador->clasificador_id ?>][]">
 				<option value></option>
 				<option value=1>Factura</option>
 				<option value=2>Boleta</option>
@@ -102,12 +102,12 @@ use app\models\RecursoProgramado;
 				</select>
 			    </td>
 			    <td>
-				<input type="text" class="numerico form-control" name="DetalleRendicion[nros_documentos][]" maxlength="20">
+				<input type="text" class="numerico form-control" name="DetalleRendicion[nros_documentos][<?= $clasificador->clasificador_id ?>][]" maxlength="20">
 			    </td>
 			    <td>
-				<input type="text" class="datepicker form-control" name="DetalleRendicion[fechas][]">
+				<input type="text" class="datepicker form-control" name="DetalleRendicion[fechas][<?= $clasificador->clasificador_id ?>][]">
 			    </td>
-			    <td><input type="text" id="detallerendicion-total_<?= $cont.'_'.$a ?>" class="form-control" name="DetalleRendicion[total][]" placeholder=""  Disabled value="<?= $recurso->cantidad*$recurso->precio_unit ?>"></td>
+			    <td><input type="text" id="detallerendicion-total_<?= $cont.'_'.$a ?>" class="form-control" name="DetalleRendicion[total][<?= $clasificador->clasificador_id ?>][]" placeholder=""  Disabled value="<?= $recurso->cantidad*$recurso->precio_unit ?>"></td>
 			    <td>
 				<!-- Button trigger modal -->
 				<span style="cursor: pointer" class="glyphicon glyphicon-list-alt" data-toggle="modal" data-target="#myModal<?= $i?>"></span>
@@ -121,7 +121,7 @@ use app\models\RecursoProgramado;
 					<h4 class="modal-title" id="myModalLabel">Observación</h4>
 				      </div>
 				      <div class="modal-body">
-					<textarea class="form-control" name="DetalleRendicion[observaciones][]" maxlength="5000"></textarea>
+					<textarea class="form-control" name="DetalleRendicion[observaciones][<?= $clasificador->clasificador_id ?>][]" maxlength="5000"></textarea>
 				      </div>
 				    </div>
 				  </div>

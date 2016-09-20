@@ -141,6 +141,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filter' => [0=>"Incompleto",1=>"Pendiente",2=>"Completo"]
                 //'width'=>'60px',
             ],
+            [
+                'label'=>'Total Monetario',
+                'attribute' => 'total_monetario',
+                'format'=>'raw',
+                //'width'=>'60px',
+            ],
              /*[
                 'label'=>'',
                 //'attribute' => 'codigo_modular',

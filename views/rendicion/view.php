@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
 use app\models\Usuarios;
-
+use app\models\DetalleRendicion;
 use app\models\RecursoProgramado;
 ?>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
@@ -19,7 +19,6 @@ use app\models\RecursoProgramado;
 <h3>Nueva Rendición</h3>
 <?php $form = ActiveForm::begin(['options' => ['class' => '', ]]); ?>
 <?= \app\widgets\observacion\ObservacionWidget::widget(['maestro'=>'DetalleRendicion','titulo'=>'Motivo del Rechazo:','tipo'=>'1']); ?>
-
 
             <input type="hidden"  id="id" name="DetalleRendicion[id_ren]" value="<?= $rendicion->id; ?>" />
             <input type="hidden" value="" id="detallerendicion-respuesta_aprob" name="DetalleRendicion[respuesta_aprob]" /> 
@@ -46,8 +45,8 @@ use app\models\RecursoProgramado;
 	    </div>
 	    <div id="collapse<?= $cont ?>" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
 		<div class="panel-body">
-		    <?php $recursos = RecursoProgramado::find()
-                        ->select('detalle_rendicion.id as detalle_id,detalle_rendicion.fecha,detalle_rendicion.tipo_documento,detalle_rendicion.observacion_descripcion,detalle_rendicion.nro_documento,detalle_rendicion.razon_social,detalle_rendicion.ruc,objetivo_especifico.descripcion obj_des,actividad.descripcion act_des,recurso.id as recurso_id, recurso.detalle,recurso_programado.anio,recurso_programado.mes,recurso_programado.precio_unit, (recurso_programado.cantidad - recurso_programado.cant_rendida) as cantidad')
+		    <?php /*$recursos = RecursoProgramado::find()
+				->select('detalle_rendicion.id as detalle_id,detalle_rendicion.fecha,detalle_rendicion.tipo_documento,detalle_rendicion.observacion_descripcion,detalle_rendicion.nro_documento,detalle_rendicion.razon_social,detalle_rendicion.ruc,objetivo_especifico.descripcion obj_des,actividad.descripcion act_des,recurso.id as recurso_id, recurso.detalle,recurso_programado.anio,recurso_programado.mes,recurso_programado.precio_unit, (recurso_programado.cantidad - recurso_programado.cant_rendida) as cantidad')
                                 ->innerJoin('recurso','recurso.id=recurso_programado.id_recurso')
                                 ->innerJoin('aportante','aportante.id=recurso.fuente')
                                 ->innerJoin('maestros','maestros.id=recurso.clasificador_id')
@@ -58,6 +57,19 @@ use app\models\RecursoProgramado;
 				->innerJoin('detalle_rendicion','detalle_rendicion.id_recurso=recurso.id')
                                 ->where('detalle_rendicion.id_rendicion='.$rendicion->id.' and proyecto.estado = 1 and aportante.tipo = 1 and recurso_programado.estado = 1 and recurso_programado.cantidad > 0  and recurso.clasificador_id = :clasificador_id',[':clasificador_id'=>$clasificador->clasificador_id])
                                 ->groupBy('recurso_id,recurso.detalle,recurso_programado.anio,recurso_programado.mes')
+                                ->all();*/
+				
+			    $recursos=  DetalleRendicion::find()
+				->select('detalle_rendicion.*,recurso.id recurso_id,recurso.detalle,objetivo_especifico.descripcion obj_des,actividad.descripcion act_des')
+                                ->innerJoin('recurso','recurso.id=detalle_rendicion.id_recurso')
+				->innerJoin('maestros','maestros.id=detalle_rendicion.id_clasificador')
+				->innerJoin('aportante','aportante.id=recurso.fuente')
+                                ->innerJoin('actividad','actividad.id=recurso.actividad_id')
+                                ->innerJoin('indicador','indicador.id=actividad.id_ind')
+                                ->innerJoin('objetivo_especifico','objetivo_especifico.id=indicador.id_oe')
+				->innerJoin('proyecto','proyecto.id=objetivo_especifico.id_proyecto')
+				->innerJoin('recurso_programado','recurso.id=recurso_programado.id_recurso')
+                                ->where('proyecto.estado = 1 and aportante.tipo = 1 and recurso_programado.cantidad > 0 and recurso_programado.estado = 1 and detalle_rendicion.id_rendicion='.$rendicion->id.' and detalle_rendicion.id_clasificador = :clasificador_id',[':clasificador_id'=>$clasificador->id_clasificador])
                                 ->all();
 		    ?>
 		    <table class="table borderless table-hover">
@@ -80,7 +92,7 @@ use app\models\RecursoProgramado;
 		    <?php $i=1+$b; ?>
 		    <?php foreach($recursos as $recurso){ ?>
 			<tr>
-			    <input type="hidden" name="DetalleRendicion[detalle_ids][]" value="<?= $recurso->detalle_id; ?>" />
+			    <input type="hidden" name="DetalleRendicion[detalle_ids][]" value="<?= $recurso->id; ?>" />
 			    <input type="hidden" name="DetalleRendicion[clasificador_id][]" value="<?= $clasificador->clasificador_id ?>">
 			    <input type="hidden" name="DetalleRendicion[anio][]" value="<?= $recurso->anio ?>">
 			    <?php //var_dump($recurso->anio);die; ?>
@@ -91,11 +103,11 @@ use app\models\RecursoProgramado;
 			    <input type="hidden" name="DetalleRendicion[recursos][]" value="<?= $recurso->recurso_id ?>"></td>
 			    
 			    <td><?= $model->GetMes($recurso->mes) ?> <input type="hidden" name="DetalleRendicion[mes][]" value="<?= $recurso->mes ?>"></td>
-			    <td><input onkeyup="calcular_total('<?= $cont.'_'.$a ?>')" type="text" id="detallerendicion-precio_unit_<?= $cont.'_'.$a ?>" class="form-control decimal" name="DetalleRendicion[precio_unit][]" placeholder="" value="<?= $recurso->precio_unit ?>" /></td>
-			    <td><input onkeyup="calcular_total('<?= $cont.'_'.$a ?>')" type="text" id="detallerendicion-cantidad_<?= $cont.'_'.$a ?>" class="form-control entero" name="DetalleRendicion[cantidad][]" placeholder=""  value="<?= $recurso->cantidad ?>"/></td>
-			    <td><input type="text" id="detallerendicion-ruc_<?= $cont.'_'.$a ?>" class="form-control entero numerico" name="DetalleRendicion[ruc][]" placeholder=""  maxlength="12" value="<?= $recurso->ruc ?>" /></td>
-			    <td><input type="text" id="detallerendicion-razon_social_<?= $cont.'_'.$a ?>" class="form-control texto" name="DetalleRendicion[razon_social][]" placeholder=""  value="<?= $recurso->razon_social ?>" /></td>
-			    <td><select class="form-control" name="DetalleRendicion[tipos_documentos][]">
+			    <td><input onkeyup="calcular_total('<?= $cont.'_'.$a ?>')" type="text" id="detallerendicion-precio_unit_<?= $cont.'_'.$a ?>" class="form-control decimal" name="DetalleRendicion[precio_unit][]" placeholder="" value="<?= $recurso->precio_unit ?>" disabled /></td>
+			    <td><input onkeyup="calcular_total('<?= $cont.'_'.$a ?>')" type="text" id="detallerendicion-cantidad_<?= $cont.'_'.$a ?>" class="form-control entero" name="DetalleRendicion[cantidad][]" placeholder=""  value="<?= $recurso->cantidad ?>" disabled/></td>
+			    <td><input type="text" id="detallerendicion-ruc_<?= $cont.'_'.$a ?>" class="form-control entero numerico" name="DetalleRendicion[ruc][]" placeholder=""  maxlength="12" value="<?= $recurso->ruc ?>" disabled /></td>
+			    <td><input type="text" id="detallerendicion-razon_social_<?= $cont.'_'.$a ?>" class="form-control texto" name="DetalleRendicion[razon_social][]" placeholder=""  value="<?= $recurso->razon_social ?>" disabled /></td>
+			    <td><select class="form-control" name="DetalleRendicion[tipos_documentos][]" disabled>
 				<option value></option>
 				<option value=1 <?= ($recurso->tipo_documento==1)?'selected':''; ?>>Factura</option>
 				<option value=2 <?= ($recurso->tipo_documento==2)?'selected':''; ?>>Boleta</option>
@@ -104,12 +116,12 @@ use app\models\RecursoProgramado;
 				</select>
 			    </td>
 			    <td>
-				<input type="text" class="numerico form-control" name="DetalleRendicion[nros_documentos][]" maxlength="20" value="<?= $recurso->nro_documento ?>">
+				<input type="text" class="numerico form-control" name="DetalleRendicion[nros_documentos][]" maxlength="20" value="<?= $recurso->nro_documento ?>" disabled>
 			    </td>
 			    <td>
-				<input type="text" class="datepicker form-control" name="DetalleRendicion[fechas][]" value="<?= date('d-m-Y',strtotime($recurso->fecha)) ?>">
+				<input type="text" class="datepicker form-control" name="DetalleRendicion[fechas][]" value="<?= date('d-m-Y',strtotime($recurso->fecha)) ?>" disabled>
 			    </td>
-			    <td><input type="text" id="detallerendicion-total_<?= $cont.'_'.$a ?>" class="form-control" name="DetalleRendicion[total][]" placeholder=""  Disabled value="<?= $recurso->cantidad*$recurso->precio_unit ?>"></td>
+			    <td><input type="text" id="detallerendicion-total_<?= $cont.'_'.$a ?>" class="form-control" name="DetalleRendicion[total][]" placeholder=""  disabled value="<?= $recurso->cantidad*$recurso->precio_unit ?>"></td>
 			    <td>
 				<!-- Button trigger modal -->
 				<span style="cursor: pointer" class="glyphicon glyphicon-list-alt" data-toggle="modal" data-target="#myModal<?= $i?>"></span>
@@ -233,7 +245,6 @@ use app\models\RecursoProgramado;
 		</div>
                 
 
-
 <?php ActiveForm::end(); ?>
 <?php
 
@@ -257,7 +268,7 @@ $('#detalle_tabla  td:nth-child(10)').hide();
     
  calcular_total(0);
  
- $('#form1').find('input, textarea, select').prop('disabled', true);
+ //$('#w0').find('input, textarea, select').prop('disabled', true);
     $('.hiden_cls').prop('disabled', false);
     $('#id').prop('disabled', false);
     $('#detallerendicion-respuesta_aprob').prop('disabled', false);

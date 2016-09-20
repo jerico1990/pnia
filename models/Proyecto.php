@@ -141,6 +141,7 @@ class Proyecto extends \yii\db\ActiveRecord
             public $id_ind;
             
             public $total;
+            public $total_monetario;
     /**
      * @inheritdoc
      */

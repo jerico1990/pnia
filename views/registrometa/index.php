@@ -110,7 +110,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     async: false,
                     //data: {unidadejecutora:unidad.val()},
                     success: function(data){
-                      valor1 = data;
+                        valor1 = data;
                     }
                 });
         

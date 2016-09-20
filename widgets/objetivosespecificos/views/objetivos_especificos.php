@@ -1,8 +1,8 @@
 
 <div class="clearfix"></div>
-<div id="divobjetivo" class="col-xs-12 col-sm-9 col-md-12">
+<div id="divobjetivo" class="col-xs-12 col-sm-9 col-md-12" style="height: 65px;">
 		<?php //if($objetivoespecifico) {?>
-                <div class="col-xs-12 col-sm-9 col-md-12" id="proyecto-div_id_<?= $correlativo; ?>" >
+                <div class="col-md-12" id="proyecto-div_id_<?= $correlativo; ?>" >
 		    <input type="hidden" value="<?= $objetivoespecifico->id?>" id="proyecto-obj_id_<?= $correlativo; ?>" name="Proyecto[objetivos_ids][]" />
 		    <input type="hidden" value="<?= $objetivoespecifico->gestion;?>" id="proyecto-gestion_<?= $correlativo; ?>" name="Proyecto[gestion][]" /> 
 		    <!--<div class="col-md-1" >
@@ -23,6 +23,7 @@
 		    <div class="col-md-1">
 			Peso:
 			</div>
+		    
 		    <div class="col-xs-12 col-sm-9 col-md-2" >
 			
 			<div class="form-group field-proyecto-objetivos_peso_<?= $correlativo; ?> required">
@@ -30,7 +31,7 @@
 			    <input class="form-control entero text-center" type="text" maxlength="3" value="<?= $objetivoespecifico->peso;?>" placeholder="" id="proyecto-objetivos_peso_<?= $correlativo; ?>" name="Proyecto[objetivos_peso][]"  required>
 			</div>    
 		    </div>
-
+		    <div class="clearfix"></div>
                     
                     <br>
                 </div>

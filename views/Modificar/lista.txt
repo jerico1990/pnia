@@ -1,0 +1,16 @@
+accion.php
+copy
+create.php
+index.php
+lista.txt
+modificaract.php
+modificardatosgen.php
+modificarfinanciamiento.php
+modificarobjind.php
+modificarobs.php
+modificarrec.php
+observaciones.php
+update.php
+view.php
+_form.php
+_search.php

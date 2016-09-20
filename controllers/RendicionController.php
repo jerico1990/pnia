@@ -232,12 +232,17 @@ class RendicionController extends Controller
         {
             $rendicion = Rendicion::findOne($id);
             $detRendicion =  DetalleRendicion::find()->where('id_rendicion = :id_rendicion',[':id_rendicion'=>$id])->all();
-          
+            $clasificadores=  DetalleRendicion::find()
+                                ->select('detalle_rendicion.id_clasificador, maestros.descripcion')
+                                ->innerJoin('maestros','maestros.id=detalle_rendicion.id_clasificador')
+                                ->where('detalle_rendicion.id_rendicion = :id_rendicion',[':id_rendicion'=>$id])
+                                ->groupBy(['detalle_rendicion.id_clasificador'])
+                                ->all();
             $clasif = Maestros::find()
                                 ->where('id_padre = 32 and estado = 1')
                                 ->orderBy('orden')
                                 ->all();
-          
+            /*
             $clasificadores = RecursoProgramado::find()
                                 ->select('recurso.clasificador_id, maestros.descripcion')
                                 ->innerJoin('recurso','recurso.id=recurso_programado.id_recurso')
@@ -251,6 +256,7 @@ class RendicionController extends Controller
                                 ->where('proyecto.estado = 1 and aportante.tipo = 1 and recurso_programado.estado = 1 and recurso_programado.cantidad > 0  ')
                                 ->groupBy(['recurso.clasificador_id'])
                                 ->all();
+                                */
             /*if(!$clasificadores)
             {
                 $clasificadores = RecursoProgramado::find()
@@ -465,68 +471,72 @@ class RendicionController extends Controller
         
         if ($model->load(Yii::$app->request->post()))
         {
-            $countregistros = count(array_filter($model->ruc));
-            
             $hoy = getdate();
-            
             $desembolsos = SolicitudDesembolso::find()
                             ->where('estado = 1 and id_user = :id_user',[':id_user'=>Yii::$app->user->identity->id])
                             ->one();             
-                        $rendicion=new Rendicion();
-                        $rendicion->id_user= Yii::$app->user->identity->id;
-                        $rendicion->fecha= $hoy['year'].'-'.$hoy['mon'].'-'.$hoy['mday'];
-                        $rendicion->id_solicitud = $desembolsos->id;
-                        $rendicion->save();
+            $rendicion=new Rendicion();
+            $rendicion->id_user= Yii::$app->user->identity->id;
+            $rendicion->fecha= $hoy['year'].'-'.$hoy['mon'].'-'.$hoy['mday'];
+            $rendicion->id_solicitud = $desembolsos->id;
+            $rendicion->save();
             
-                    for($i=0;$i<$countregistros;$i++)
+            foreach($model->ruc as $key => $ruc)
+            {
+                $countregistros = count(array_filter($model->ruc[$key]));
+                //var_dump($countregistros);
+                for($i=0;$i<$countregistros;$i++)
+                {
+                    $recurso = Recurso::findOne($model->recursos[$key][$i]);
+                    
+                    $detRendicion=new DetalleRendicion();
+                    $detRendicion->id_rendicion = $rendicion->id;
+                    $detRendicion->id_clasificador= $key;
+                    $detRendicion->id_recurso=$recurso->id;
+                    $detRendicion->descripcion=$recurso->detalle;
+                    $detRendicion->mes=$model->mes[$key][$i];
+                    $detRendicion->anio=$model->anio[$key][$i];
+                    $detRendicion->cantidad=$model->cantidad[$key][$i];
+                    $detRendicion->precio_unit=$model->precio_unit[$key][$i];
+                    $detRendicion->total= ($model->cantidad[$key][$i] * $model->precio_unit[$key][$i]);
+                    $detRendicion->ruc=$model->ruc[$key][$i];
+                    $detRendicion->razon_social=$model->razon_social[$key][$i];
+                    $detRendicion->tipo_documento=$model->tipos_documentos[$key][$i];
+                    $detRendicion->nro_documento=$model->nros_documentos[$key][$i];
+                    $detRendicion->observacion_descripcion=$model->observaciones[$key][$i];
+                    $fecha=str_replace("/", "-", $model->fechas[$key][$i]);
+                    $detRendicion->fecha=date("Y-m-d",strtotime($fecha));
+                    $detRendicion->save();
+                    
+                    $programado = RecursoProgramado::find()
+                                    ->where('recurso_programado.id_recurso = :id_recurso and recurso_programado.anio = :anio and recurso_programado.mes = :mes',[':id_recurso'=>$detRendicion->id_recurso,':anio'=>$detRendicion->anio,':mes'=>$detRendicion->mes])
+                                    ->one();
+                    $programado->cant_rendida = ($programado->cant_rendida + $detRendicion->cantidad);
+                    $programado->precio_unit_rendido = $detRendicion->precio_unit;
+                    if($programado->cant_rendida == $programado->cantidad)
                     {
-                        $recurso = Recurso::findOne($model->recursos[$i]);
-                        
-                        $detRendicion=new DetalleRendicion();
-                        $detRendicion->id_rendicion = $rendicion->id;
-                        $detRendicion->id_clasificador= $model->clasificador_id[$i];
-                        $detRendicion->id_recurso=$recurso->id;
-                        $detRendicion->descripcion=$recurso->detalle;
-                        $detRendicion->mes=$model->mes[$i];
-                        $detRendicion->anio=$model->anio[$i];
-                        $detRendicion->cantidad=$model->cantidad[$i];
-                        $detRendicion->precio_unit=$model->precio_unit[$i];
-                        $detRendicion->total= ($model->cantidad[$i] * $model->precio_unit[$i]);
-                        $detRendicion->ruc=$model->ruc[$i];
-                        $detRendicion->razon_social=$model->razon_social[$i];
-                        $detRendicion->tipo_documento=$model->tipos_documentos[$i];
-                        $detRendicion->nro_documento=$model->nros_documentos[$i];
-                        $detRendicion->observacion_descripcion=$model->observaciones[$i];
-                        $fecha=str_replace("/", "-", $model->fechas[$i]);
-                        $detRendicion->fecha=date("Y-m-d",strtotime($fecha));
-                        $detRendicion->save();
-                        
-                        $programado = RecursoProgramado::find()
-                                        ->where('recurso_programado.id_recurso = :id_recurso and recurso_programado.anio = :anio and recurso_programado.mes = :mes',[':id_recurso'=>$detRendicion->id_recurso,':anio'=>$detRendicion->anio,':mes'=>$detRendicion->mes])
-                                        ->one();
-                        $programado->cant_rendida = ($programado->cant_rendida + $detRendicion->cantidad);
-                        $programado->precio_unit_rendido = $detRendicion->precio_unit;
-                        if($programado->cant_rendida == $programado->cantidad)
-                        {
-                          $programado->estado = 2;  
-                        }
-                        $programado->update();
-                        
-                        $totales += $detRendicion->total;
-                        
-                        
-                    }$model->archivos = UploadedFile::getInstances($model, 'archivos');
-                    foreach ($model->archivos as $file) {
-                        $archivo=new RendicionArchivo;
-                        $archivo->fecha_registro=date("Y-m-d H:i:s");
-                        $archivo->estado=1;
-                        $archivo->rendicion_id=$rendicion->id;
-                        $archivo->save();
-                        
-                        $archivo->archivo=$archivo->id. '.' . $file->extension;
-                        $archivo->update();
-                        $file->saveAs('archivos/' . $archivo->id . '.' . $file->extension);
+                      $programado->estado = 2;  
                     }
+                    $programado->update();
+                    
+                    $totales += $detRendicion->total;
+                    
+                    
+                }
+            }
+                    
+            $model->archivos = UploadedFile::getInstances($model, 'archivos');
+            foreach ($model->archivos as $file) {
+                $archivo=new RendicionArchivo;
+                $archivo->fecha_registro=date("Y-m-d H:i:s");
+                $archivo->estado=1;
+                $archivo->rendicion_id=$rendicion->id;
+                $archivo->save();
+                
+                $archivo->archivo=$archivo->id. '.' . $file->extension;
+                $archivo->update();
+                $file->saveAs('archivos/' . $archivo->id . '.' . $file->extension);
+            }
                     
             return $this->redirect('index');
             

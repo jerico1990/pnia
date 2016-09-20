@@ -46,6 +46,7 @@ class ProyectoSearch extends Proyecto
         if((Yii::$app->user->identity->id_perfil == 1) || (Yii::$app->user->identity->id_perfil == 4) || (Yii::$app->user->identity->id_perfil == 6))
         {
         $query = Proyecto::find()
+                        ->select('proyecto.*,(select sum(monetario) from aportante where id_proyecto=proyecto.id) as total_monetario')
                         ->where('estado = 1');
                         //->all();
         }
@@ -53,6 +54,7 @@ class ProyectoSearch extends Proyecto
         if(Yii::$app->user->identity->id_perfil == 3) 
         {
         $query = Proyecto::find()
+                        ->select('proyecto.*,(select sum(monetario) from aportante where id_proyecto=proyecto.id) as total_monetario')
                         ->where('estado = 1 and id_unidad_ejecutora =:id_unidad_ejecutora and id_dependencia_inia = :id_dependencia_inia',[":id_unidad_ejecutora"=>Yii::$app->user->identity->ejecutora,":id_dependencia_inia"=>Yii::$app->user->identity->dependencia]);
                         //->all();
         }
@@ -60,6 +62,7 @@ class ProyectoSearch extends Proyecto
         if(Yii::$app->user->identity->id_perfil == 5) 
         {
         $query = Proyecto::find()
+                        ->select('proyecto.*,(select sum(monetario) from aportante where id_proyecto=proyecto.id) as total_monetario')
                         ->where('estado = 1 and id_unidad_ejecutora =:id_unidad_ejecutora',[":id_unidad_ejecutora"=>Yii::$app->user->identity->ejecutora]);
                         //->all();
         }

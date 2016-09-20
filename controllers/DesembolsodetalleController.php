@@ -6,6 +6,7 @@ use Yii;
 use app\models\RecursoProgramado;
 use app\models\SolicitudDesembolso;
 use app\models\DetalleSolicitud;
+use app\models\Proyecto;
 use app\models\DesembolsoDetalleSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -175,12 +176,21 @@ class DesembolsodetalleController extends Controller
         $desembolsos = SolicitudDesembolso::find()
                             ->where('estado in(0,1) and id_user = :id_user',[':id_user'=>$id_user])
                             ->count();
-                            
+        $proyecto=Proyecto::find()->where('estado=0 and situacion in(0,1) and user_propietario=:user_propietario',[':user_propietario'=>$id_user])->one();
         if($desembolsos > 0)
-            {
-                return json_encode(array('estado'=>1,'mensaje'=>"Tiene una Solicitud de Desembolso Inconclusa."));
-            }
-            
-            return json_encode(array('estado'=>0,'mensaje'=>""));
+        {
+            return json_encode(array('estado'=>1,'mensaje'=>"Tiene una Solicitud de Desembolso Inconclusa."));
+        }
+        if($proyecto->situacion==0)
+        {
+            return json_encode(array('estado'=>1,'mensaje'=>"Tiene la Modificación del proyecto Incompleto."));
+        }
+        elseif($proyecto->situacion==1)
+        {
+            return json_encode(array('estado'=>1,'mensaje'=>"Tiene la Modificación del proyecto en Pendiente."));
+        }
+        
+        
+        return json_encode(array('estado'=>0,'mensaje'=>""));
     }
 }

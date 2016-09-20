@@ -672,7 +672,7 @@ use app\models\Perfil;
                      
                 ?>
                     <div class="panel panel-primary">
-                      <div class="panel-heading" style="height: 45px;padding:5px">
+                      <div class="panel-heading" style="height: 65px;padding:5px">
                         <?= \app\widgets\objetivosespecificos\ObjetivosEspecificosWidget::widget(['objetivo_id'=>$objetivo->id,'correlativo'=>$i]) ?>
                       </div>
                       <div id="collapse<?= $i; ?>" class="panel-collapse collapse <?=($i == 0)?'in':'' ?>">

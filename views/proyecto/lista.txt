@@ -1,0 +1,22 @@
+actividad.php
+areasclaves.php
+copy
+create.php
+datosgenerales Copy con responsable.php
+datosgenerales.php
+grabar.php
+index.php
+indicador.php
+lista.txt
+marcologico.php
+modificaractrec.php
+modificardatosgen.php
+nuevo.php
+objetivo_indicador.php
+observaciones.php
+otros.php
+recursos.php
+update.php
+view.php
+_form.php
+_search.php

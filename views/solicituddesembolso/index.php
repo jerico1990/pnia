@@ -157,7 +157,6 @@ $("#nuevo_desembolso").click(function()
                     data: {id_user:<?= Yii::$app->user->identity->id; ?>},
                     success: function(data){
                          valor = jQuery.parseJSON(data);
-                      
                     }
                 });
         
@@ -179,7 +178,7 @@ $("#nuevo_desembolso").click(function()
         }
         
         
-        return true;
+        return false;
         
     });
     

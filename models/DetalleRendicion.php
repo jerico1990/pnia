@@ -38,6 +38,10 @@ class DetalleRendicion extends \yii\db\ActiveRecord
     public $nros_documentos;
     public $fechas;
     public $observaciones;
+    public $obj_des;
+    public $act_des;
+    public $detalle;
+    public $recurso_id;
     public static function tableName()
     {
         return 'detalle_rendicion';

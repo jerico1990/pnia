@@ -1,0 +1,11 @@
+create.php
+detalle.php
+detallebk.php
+index.php
+lista.txt
+proyecto.php
+update.php
+view.php
+viewbk.php
+_form.php
+_search.php

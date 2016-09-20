@@ -56,7 +56,9 @@ if (isset($_GET['page']) >= 2)
                     ?>
                 </td>
                 <td>
-                    <a class="btn btn-primary btn-xs ver" href="/pnia/web/rendicion/view?id=<?= $rendicion["id"] ?>" title="Ver Desembolso"><span class="fa fa-search">Ver</span></a>
+                    <?= Html::a('<span class="fa fa-search">Ver</span>',['rendicion/view','id'=>$rendicion["id"]],['title'=>'Ver Desembolso','class'=>'btn btn-primary btn-xs ver']);?>
+                    
+                    
                 </td>
                 <td>
                     <?php  //echo $rendicion["total"];

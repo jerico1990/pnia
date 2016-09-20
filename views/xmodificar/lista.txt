@@ -1,0 +1,4 @@
+accion.php
+copy
+lista.txt
+observaciones.php
