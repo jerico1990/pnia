@@ -1,13 +1,7 @@
-<<<<<<< HEAD
-config/db.php
-=======
 
->>>>>>> 6fefde17b5af12e5e9a8fcdb5ee9fd9ca9884a1f
 !assets/.gitignore
 protected/runtime/*
 !protected/runtime/.gitignore
 protected/data/*.db
-themes/classic/views/
 runtime/*
 web/assets/*
-vendor/*
