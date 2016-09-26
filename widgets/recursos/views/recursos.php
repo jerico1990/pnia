@@ -47,7 +47,7 @@
 				    <tr id='recurso_addr_<?= $correlativo; ?>_<?= $re ?>'>
 					<td>
 					<?= ($re+1) ?>
-					
+					<input type="hidden" name="Proyecto[idactividades][]" value="<?= $actividad_id; ?>">
                                         <input type="hidden" name="Proyecto[recurso_act_ids][]" id="proyecto-recurso_act_ids_<?= $re; ?>" value="<?= $actividad_id; ?>" />
 					<input type="hidden" name="Proyecto[recurso_numero][]" id="proyecto-recurso_numero_<?= $re; ?>" value="<?= $re; ?>" />
 					</td>
@@ -133,6 +133,7 @@
 				<tr id='recurso_addr_<?= $correlativo; ?>_0'>
 				    <td>
 				    <?= ($re+1) ?>
+				    <input type="hidden" name="Proyecto[idactividades][]" value="<?= $actividad_id; ?>">
 				    <input type="hidden" name="Proyecto[recurso_act_ids][]" id="proyecto-recurso_act_ids_<?= $re; ?>" value="<?= $actividad_id; ?>" />
                                     <input type="hidden" name="Proyecto[recurso_numero][]" id="proyecto-recurso_numero_<?= $re; ?>" value="<?= $re; ?>" />
 				    </td>

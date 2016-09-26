@@ -1232,11 +1232,11 @@ class ModificarController extends Controller
                 
                 for($i=0;$i<$countRecurso;$i++)
                 {
-                    $flat .= 'a';
+                    
                     if(isset($proyecto->recurso_ids[$i]))
                     {
                         $recurso=Recurso::findOne($proyecto->recurso_ids[$i]);
-                        $recurso->actividad_id=$proyecto->id_actividad;
+                        $recurso->actividad_id=$proyecto->idactividades[$i];
                         $recurso->clasificador_id=$proyecto->recurso_clasificador[$i];
                         $recurso->detalle=$proyecto->recurso_descripcion[$i];
                         $recurso->unidad_medida=$proyecto->recurso_unidad[$i];
@@ -1250,7 +1250,7 @@ class ModificarController extends Controller
                     {
                         
                         $recurso = new Recurso;
-                        $recurso->actividad_id=$proyecto->id_actividad;
+                        $recurso->actividad_id=$proyecto->idactividades[$i];
                         $recurso->clasificador_id=$proyecto->recurso_clasificador[$i];
                         $recurso->detalle=$proyecto->recurso_descripcion[$i];
                         $recurso->unidad_medida=$proyecto->recurso_unidad[$i];

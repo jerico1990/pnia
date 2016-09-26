@@ -29,6 +29,7 @@ class Recurso extends \yii\db\ActiveRecord
     public $id_actividad;
     public $descripcion;
     public $total;
+    
     /**
      * @inheritdoc
      */

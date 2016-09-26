@@ -142,6 +142,8 @@ class Proyecto extends \yii\db\ActiveRecord
             
             public $total;
             public $total_monetario;
+            
+            public $idactividades;
     /**
      * @inheritdoc
      */
@@ -158,7 +160,7 @@ class Proyecto extends \yii\db\ActiveRecord
         return [
             [['modificacion','situacion','tipo_registro','id_areatematica','id_especie','id_cultivo','id_programa','id_direccion_linea','id_unidad_ejecutora','id_dependencia_inia','id_tipo_proyecto', 'user_propietario', 'estado','id','vigencia'], 'integer'],
             [['presupuesto','total'], 'number'],
-            [['prueba'],'safe'],
+            [['prueba','idactividades'],'safe'],
             [['recurso_numero','id_objetivo','recurso_act_ids','distrito','nombres','apellidos','telefono','celular','correo','descripciones','ids','objetivos_ids',
               'objetivos_descripciones','actividades_ids','actividades_descripciones','opcion',
               'indicadores_ids','indicadores_oe_ids','indicadores_descripciones','descripcion','observacion','cerrar_modificacion',
