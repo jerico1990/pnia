@@ -59,7 +59,7 @@ use app\models\RecursoProgramado;
                                 ->groupBy('recurso_id,recurso.detalle,recurso_programado.anio,recurso_programado.mes')
                                 ->all();*/
 				
-			    $recursos=  DetalleRendicion::find()
+			    /*$recursos=  DetalleRendicion::find()
 				->select('detalle_rendicion.*,recurso.id recurso_id,recurso.detalle,objetivo_especifico.descripcion obj_des,actividad.descripcion act_des')
                                 ->innerJoin('recurso','recurso.id=detalle_rendicion.id_recurso')
 				->innerJoin('maestros','maestros.id=detalle_rendicion.id_clasificador')
@@ -70,6 +70,19 @@ use app\models\RecursoProgramado;
 				->innerJoin('proyecto','proyecto.id=objetivo_especifico.id_proyecto')
 				->innerJoin('recurso_programado','recurso.id=recurso_programado.id_recurso')
                                 ->where('proyecto.estado = 1 and aportante.tipo = 1 and recurso_programado.cantidad > 0 and recurso_programado.estado = 1 and detalle_rendicion.id_rendicion='.$rendicion->id.' and detalle_rendicion.id_clasificador = :clasificador_id',[':clasificador_id'=>$clasificador->id_clasificador])
+                                ->all();*/
+			    
+			    $recursos=  DetalleRendicion::find()
+				->select('detalle_rendicion.*,recurso.id recurso_id,recurso.detalle,objetivo_especifico.descripcion obj_des,actividad.descripcion act_des')
+                                ->innerJoin('recurso','recurso.id=detalle_rendicion.id_recurso')
+				->innerJoin('maestros','maestros.id=detalle_rendicion.id_clasificador')
+				->innerJoin('aportante','aportante.id=recurso.fuente')
+                                ->innerJoin('actividad','actividad.id=recurso.actividad_id')
+                                ->innerJoin('indicador','indicador.id=actividad.id_ind')
+                                ->innerJoin('objetivo_especifico','objetivo_especifico.id=indicador.id_oe')
+				->innerJoin('proyecto','proyecto.id=objetivo_especifico.id_proyecto')
+				->innerJoin('recurso_programado','recurso.id=recurso_programado.id_recurso')
+                                ->where('detalle_rendicion.id_rendicion='.$rendicion->id.' and detalle_rendicion.id_clasificador = :clasificador_id',[':clasificador_id'=>$clasificador->id_clasificador])
                                 ->all();
 		    ?>
 		    <table class="table borderless table-hover">

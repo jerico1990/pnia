@@ -97,7 +97,7 @@ use yii\web\JsExpression;
 					    <?php } ?>
 					</td>
 					<td>
-					    <?= round(($consolidado->precio_total*100)/$proyecto->total,2) ?>
+					    <?= ($proyecto->total>0)?round(($consolidado->precio_total*100)/$proyecto->total,2):0; ?>
 					</td>
 					<td class="soles"><?= $consolidado->precio_total ?></td>
 				    </tr>

@@ -21,10 +21,8 @@ use app\models\Maestros;
 <div id="form1" >
     <?php $form = ActiveForm::begin(['options' => ['class' => '', ]]); ?>
     <?= \app\widgets\observacion\ObservacionWidget::widget(['maestro'=>'Proyecto','titulo'=>'Motivo de la Observación:','tipo'=>'1']); ?>   
-<div class="alert alert-danger" id="warning">
-	   
-	    </div>
-<ul class="tabs">
+   <div class="alert alert-danger" id="warning"></div>
+   <ul class="tabs">
     <li><a href="#tab1">Datos Generales</a></li>
     <li><a href="#tab2">Financiamiento</a></li>
     <li><a href="#tab3">Objetivos e Indicadores</a></li>
@@ -37,17 +35,13 @@ use app\models\Maestros;
     
     <article id="tab1">
         
-
-            
             <div class="col-xs-12 col-sm-7 col-md-12" >
                 <div class="form-group field-proyecto-titulo required">
-                <input type="hidden" value="<?= $proyecto->id?>" id="proyecto-id" name="Proyecto[id]" />
+                <input type="hidden" value="<?= $proyecto->id ?>" id="proyecto-id" name="Proyecto[id]" />
                 <input type="hidden" value="" id="proyecto-respuesta_aprob" name="Proyecto[respuesta_aprob]" /> 
                 <label for="proyecto-titulo">Título del Proyecto:</label>
                 <input class="form-control" type="text" value="<?= $proyecto->titulo?>" placeholder="Nombre del Proyecto" id="proyecto-titulo" name="Proyecto[titulo]"  required/> <!-- required-->
                 </div>
-             
-                
             </div>
             <div class="col-xs-12 col-sm-7 col-md-4" >
                 <div class="form-group field-proyecto-vigencia required">
@@ -417,7 +411,7 @@ use app\models\Maestros;
                                     <tr id='aportante_addr_0'>
 				    <td class="col-md-5">
 				    <div class="form-group field-aportante-aporte_colaborador_0 required">
-					    <input type="text" id="aportante-aporte_colaborador_0" class="form-control " name="Aportante[aporte_colaborador][]" placeholder="" value="PNIA" disabled>
+					    <input type="text" id="aportante-aporte_colaborador_0" class="form-control " name="Aportante[aporte_colaborador][]" placeholder="" value="PNIA" disabled />
 				    </div>
                                     <input type="hidden" name="Aportante[aporte_tipo][]" id="aportante-aporte_tipo_0" value="1" />
 				    <input type="hidden" name="Aportante[aporte_numero][]" id="aportante-aporte_numero_0" value="0" />
@@ -942,7 +936,8 @@ use app\models\Maestros;
         <button type="submit" id="btnaceptar" class="btn btn-success ">Aceptar</button>   
     </div>
     <?php ActiveForm::end(); ?>
- </div>       
+ </div>
+	 </div>
   <?php
     $urlDependencia= Yii::$app->getUrlManager()->createUrl('maestros/dependencia');
     $obtenerindicadores = Yii::$app->getUrlManager()->createUrl('proyecto/obtenerindicadores');
